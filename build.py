@@ -63,6 +63,102 @@ def page(lang, file, title, body, description=""):
         f.write(html)
 
 
+
+# Einheiten-Vorstellung: (id, Name DE, Name EN, Seltenheit 0–4, Fernkampf, Text DE, Text EN, [(Fähigkeit DE, EN, Text DE, Text EN)])
+RARITY = {"de": ["Normal", "Selten", "Episch", "Legendär", "Mystisch"], "en": ["Common", "Rare", "Epic", "Legendary", "Mythic"]}
+UNITS = [
+    ("peasant", "Bauer", "Peasant", 0, False,
+     "Billig, schnell auf dem Feld und in der Masse gefährlich. Mit der Mistgabel gegen alles, was kommt.",
+     "Cheap, quick on the field and dangerous in numbers. Pitchfork versus everything.",
+     [("Verstärkung", "Reinforcement", "Es kommen immer zwei Bauern", "Two peasants always come"),
+      ("Dorfgemeinschaft", "Village Spirit", "+12 % Schaden für jeden Bauern in der Nähe", "+12 % damage for each nearby peasant")]),
+    ("knight", "Ritter", "Knight", 0, False,
+     "Der verlässliche Frontkämpfer. Hält die Linie und schlägt zurück.",
+     "The reliable front-liner. Holds the line and strikes back.",
+     [("Parade", "Parry", "Wehrt jeden 3. Hieb ab und schlägt sofort zurück", "Parries every 3rd blow and strikes back at once"),
+      ("Kriegsbanner", "War Banner", "Verbündete in der Nähe machen 20 % mehr Schaden", "Nearby allies deal 20 % more damage")]),
+    ("archer", "Bogenschütze", "Archer", 0, True,
+     "Schießt aus der zweiten Reihe und holt auch Flieger vom Himmel.",
+     "Shoots from the back row and brings down flyers too.",
+     [("Salve", "Volley", "Jeder Schuss trifft einen zweiten Gegner", "Every shot hits a second enemy"),
+      ("Pfeilregen", "Arrow Rain", "Jeder 4. Schuss lässt Pfeile auf ein ganzes Gebiet regnen", "Every 4th shot rains arrows on a whole area")]),
+    ("spearman", "Speerträger", "Spearman", 0, False,
+     "Stürmt mit Anlauf in die Gegner und durchbohrt ganze Reihen.",
+     "Charges into the enemy and skewers whole lines.",
+     [("Durchbohren", "Pierce", "Jeder 3. Stich trifft auch die Gegner dahinter", "Every 3rd thrust also hits the enemies behind"),
+      ("Speerwurf", "Spear Throw", "Wirft einen Speer auf einen fernen Gegner", "Throws a spear at a distant enemy")]),
+    ("mage", "Magier", "Mage", 0, True,
+     "Feuer, Eis oder Blitz – der Magier macht Flächenschaden und setzt ganze Gruppen in Brand.",
+     "Fire, ice or lightning – the mage deals area damage and sets whole groups on fire.",
+     [("Feuerball", "Fireball", "Explodiert und setzt alle Getroffenen in Brand", "Explodes and sets everyone hit on fire"),
+      ("Meteor", "Meteor", "Ein Meteor schlägt ein: dreifacher Flächenschaden", "A meteor strikes: triple area damage")]),
+    ("monk", "Mönch", "Monk", 0, False,
+     "Flink, zäh und schwer zu treffen. Heilt sich mitten im Kampf selbst.",
+     "Quick, tough and hard to hit. Heals himself in the middle of the fight.",
+     [("Schlaghagel", "Flurry", "Jeder 3. Angriff ist eine Serie aus drei Schlägen", "Every 3rd attack is a series of three blows"),
+      ("Ausweichen", "Evasion", "Weicht jedem 4. Nahkampfhieb aus", "Dodges every 4th melee blow")]),
+    ("priest", "Priester", "Priest", 0, True,
+     "Hält deine Armee am Leben: Heilung, Schutzschilde und sogar Wiederauferstehung.",
+     "Keeps your army alive: healing, shields and even resurrection.",
+     [("Heilwelle", "Healing Wave", "Heilt alle Verbündeten ringsum", "Heals all allies around"),
+      ("Wiederauferstehung", "Resurrection", "Gefallene Verbündete stehen wieder auf", "Fallen allies rise again")]),
+    ("templar", "Grenzwächter", "Border Warden", 0, False,
+     "Ein Schild auf zwei Beinen. Betäubt Gegner und schützt die Truppe vor Geschossen.",
+     "A shield on two legs. Stuns enemies and protects the troops from projectiles.",
+     [("Schildschlag", "Shield Bash", "Jeder 3. Schlag mit dem Schild betäubt", "Every 3rd shield blow stuns"),
+      ("Schildmauer", "Shield Wall", "Verbündete nehmen 40 % weniger Schaden von Geschossen", "Allies take 40 % less damage from projectiles")]),
+    ("hoplite", "Hoplit", "Hoplite", 1, False,
+     "Bronzeschild und Speer: im Verbund kaum zu brechen, angeschlagen am gefährlichsten.",
+     "Bronze shield and spear: almost unbreakable in formation, most dangerous when wounded.",
+     [("Phalanx", "Phalanx", "Seite an Seite mit Verbündeten: 30 % weniger Schaden", "Side by side with allies: 30 % less damage"),
+      ("Spartanischer Zorn", "Spartan Fury", "Greift schneller an, je weniger Leben er hat", "Attacks faster the less health he has")]),
+    ("assassin", "Assassine", "Assassin", 1, False,
+     "Schlägt aus dem Schatten zu, vergiftet und erledigt angeschlagene Gegner.",
+     "Strikes from the shadows, poisons and finishes off wounded enemies.",
+     [("Schattenschleier", "Shadow Veil", "Wird unsichtbar, der nächste Stich trifft dreifach", "Turns invisible, the next stab hits for triple damage"),
+      ("Giftklinge", "Poison Blade", "Jeder Stich vergiftet, Gift stapelt sich", "Every stab poisons, poison stacks")]),
+    ("berserker", "Berserker", "Berserker", 1, False,
+     "Je länger der Kampf, desto wilder. Heilt sich durch Schaden und gibt nicht auf.",
+     "The longer the fight, the wilder he gets. Heals through damage and never gives up.",
+     [("Blutdurst", "Bloodthirst", "Heilt sich um 30 % des verursachten Schadens", "Heals for 30 % of the damage dealt"),
+      ("Unsterbliche Wut", "Undying Rage", "Überlebt einen tödlichen Treffer", "Survives a lethal hit")]),
+    ("dwarf", "Zwerg", "Dwarf", 1, False,
+     "Klein, stur und mit einem Hammer, der den Boden beben lässt.",
+     "Small, stubborn and armed with a hammer that shakes the ground.",
+     [("Erdstoß", "Earth Shock", "Schaden und Betäubung ringsum", "Damage and stun all around"),
+      ("Donnerhammer", "Thunder Hammer", "Ein Blitz springt auf drei Gegner über", "Lightning jumps to three enemies")]),
+    ("shaman", "Schamane", "Shaman", 1, True,
+     "Ruft Geisterblitze und Ahnenheilung, verhext und verlangsamt Gegner.",
+     "Calls spirit lightning and ancestral healing, hexes and slows enemies.",
+     [("Geisterblitz", "Spirit Bolt", "Springt auf drei weitere Gegner über", "Jumps to three more enemies"),
+      ("Heiltotem", "Healing Totem", "Ein Totem heilt Verbündete ringsum", "A totem heals nearby allies")]),
+    ("necromancer", "Nekromant", "Necromancer", 2, True,
+     "Lässt Skelette für dich kämpfen und wird mit jedem gefallenen Gegner stärker.",
+     "Makes skeletons fight for you and grows stronger with every fallen enemy.",
+     [("Gruftruf", "Call of the Crypt", "Ruft ein Skelett neben dem Ziel herbei", "Summons a skeleton next to the target"),
+      ("Totenheer", "Army of the Dead", "Zwei Skelette erheben sich", "Two skeletons rise")]),
+    ("paladin", "Paladin", "Paladin", 2, False,
+     "Heiliger Krieger: betäubt, heilt seine Verbündeten und ist kaum totzukriegen.",
+     "Holy warrior: stuns, heals his allies and is hard to bring down.",
+     [("Weihe", "Consecration", "Gegner brennen, Verbündete heilen", "Enemies burn, allies heal"),
+      ("Hammer des Gerichts", "Hammer of Judgment", "Ein Lichthammer fällt: Flächenschaden und Betäubung", "A hammer of light falls: area damage and stun")]),
+    ("druid", "Druidin", "Druid", 2, True,
+     "Hält Gegner mit Wurzeln fest, ruft Mondfeuer und lässt Heilhaine wachsen.",
+     "Holds enemies in place with roots, calls moonfire and grows healing groves.",
+     [("Wurzelgriff", "Root Grip", "Wurzeln halten Gegner fest", "Roots hold enemies in place"),
+      ("Mondfeuer", "Moonfire", "Ein Mondstrahl: +60 % Schaden, verlangsamt", "A moonbeam: +60 % damage, slows")]),
+    ("samurai", "Samurai", "Samurai", 2, False,
+     "Der Klingenmeister: ein Hieb, der Reihen spaltet, und tödlich gegen Angeschlagene.",
+     "The blade master: one strike splits lines, deadly against the wounded.",
+     [("Iaido", "Iaido", "Erster Hieb: doppelter Schaden und Rückstoß", "First blow: double damage and knockback"),
+      ("Tausend Schnitte", "Thousand Cuts", "Schnitte durch bis zu fünf Gegner", "Cuts through up to five enemies")]),
+    ("ent", "Uralter Ent", "Ancient Ent", 4, False,
+     "Ein wandelnder Baumriese. Lässt den Boden beben, hält ganze Wellen mit Wurzeln fest und wächst nach.",
+     "A walking giant tree. Shakes the ground, holds whole waves in place with roots and grows back.",
+     [("Zorn des Waldes", "Wrath of the Forest", "Wurzeln brechen weit ringsum hervor", "Roots burst out far around"),
+      ("Entwurzeln", "Uproot", "Packt das Ziel und schleudert es weit zurück", "Grabs the target and hurls it far back")]),
+]
+
 HOME = {
     "en": {
         "tag": "Coming soon to iPhone · Android to follow",
@@ -92,6 +188,11 @@ HOME = {
             ("Your progress is safe", "Cloud backup and a transfer code for your next phone."),
         ],
         "shots_title": "Screenshots",
+        "units_title": "Meet your army",
+        "units_lead": "18 units, each with its own abilities – and every one transforms twice as it ascends. Tap a form to see it.",
+        "forms": ["Base", "Ascension I", "Ascension II"],
+        "ranged": ("Ranged", "Melee"),
+        "prev": "Previous", "next": "Next",
         "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
         "faq_title": "Questions",
         "faq": [
@@ -133,6 +234,11 @@ HOME = {
             ("Dein Fortschritt ist sicher", "Sicherung in der Cloud und ein Übertragungscode fürs nächste Handy."),
         ],
         "shots_title": "Bilder aus dem Spiel",
+        "units_title": "Deine Armee",
+        "units_lead": "18 Einheiten mit eigenen Fähigkeiten – und jede verwandelt sich beim Aufstieg zweimal. Tippe auf eine Stufe, um sie zu sehen.",
+        "forms": ["Basis", "Aufstieg I", "Aufstieg II"],
+        "ranged": ("Fernkampf", "Nahkampf"),
+        "prev": "Zurück", "next": "Weiter",
         "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
         "faq_title": "Fragen",
         "faq": [
@@ -147,6 +253,12 @@ HOME = {
         "end_cta": "Beim Betatest mitmachen",
     },
 }
+
+
+def form_label(text):
+    # Auf schmalen Bildschirmen nur „I“/„II“ zeigen, das Wort davor blendet die CSS aus.
+    word, _, num = text.rpartition(" ")
+    return f'<span class="long">{word} </span>{num}' if word else text
 
 
 def home(lang):
@@ -164,6 +276,20 @@ def home(lang):
     )
     fair = "".join(f'<div class="feature"><h3>{t}</h3><p>{x}</p></div>' for t, x in h["fair"])
     shots = "".join(f'<img src="{img(n)}" alt="Bannerfall" loading="lazy" width="720" height="1280">' for n in h["shots"])
+    lang_i = 0 if lang == "de" else 1
+    cards = []
+    for uid, n_de, n_en, rar, ranged, t_de, t_en, abil in UNITS:
+        name = n_de if lang == "de" else n_en
+        forms = "".join(
+            f'<button type="button" class="form{" on" if t == 0 else ""}" data-src="{p}img/units/{uid}_{t}.png" aria-pressed="{"true" if t == 0 else "false"}">{form_label(h["forms"][t])}</button>'
+            for t in range(3))
+        abils = "".join(f'<li><b>{a[lang_i]}</b> <span>{a[2 + lang_i]}</span></li>' for a in abil)
+        cards.append(
+            f'<article class="unit r{rar}"><div class="pic"><img src="{p}img/units/{uid}_0.png" alt="{name}" loading="lazy" width="360" height="360"></div>'
+            f'<div class="forms">{forms}</div>'
+            f'<div class="meta"><span class="rar">{RARITY[lang][rar]}</span><span class="kind">{h["ranged"][0 if ranged else 1]}</span></div>'
+            f'<h3>{name}</h3><p>{t_de if lang == "de" else t_en}</p><ul>{abils}</ul></article>')
+    units = "".join(cards)
     faq = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in h["faq"])
     body = f"""
 <main>
@@ -181,13 +307,53 @@ def home(lang):
 </div>
 </section>
 <section class="facts">{facts}</section>
+<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">‹</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">›</button></div></div><div class="gallery">{shots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
 <section id="features"><h2>{h["features_title"]}</h2><div class="rows">{feats}</div></section>
+<section id="units"><h2>{h["units_title"]}</h2><p class="section-lead">{h["units_lead"]}</p><div class="units">{units}</div></section>
 <section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
-<section><h2>{h["shots_title"]}</h2><div class="gallery">{shots}</div></section>
 <section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
 <section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="{beta}">{h["end_cta"]}</a></section>
 </main>"""
+    # Slider: Pfeile blättern eine Bildbreite weiter, mit der Maus lässt er sich ziehen.
+    # Einheiten: Klick auf eine Stufe tauscht das Bild.
+    body += """<script>
+document.querySelectorAll('.slider').forEach(function (s) {
+  var g = s.querySelector('.gallery');
+  s.querySelectorAll('.arrow').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var step = g.querySelector('img').getBoundingClientRect().width + 14;
+      var dir = +b.dataset.dir;
+      var end = g.scrollWidth - g.clientWidth - 2;
+      if (dir > 0 && g.scrollLeft >= end) g.scrollTo({left: 0, behavior: 'smooth'});
+      else if (dir < 0 && g.scrollLeft <= 2) g.scrollTo({left: end + 2, behavior: 'smooth'});
+      else g.scrollBy({left: dir * step * 2, behavior: 'smooth'});
+    });
+  });
+  var down = false, x0 = 0, l0 = 0, moved = false;
+  g.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    down = true; moved = false; x0 = e.clientX; l0 = g.scrollLeft; g.classList.add('drag');
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    if (Math.abs(e.clientX - x0) > 4) moved = true;
+    g.scrollLeft = l0 - (e.clientX - x0);
+  });
+  window.addEventListener('pointerup', function () { if (down) { down = false; g.classList.remove('drag'); } });
+  g.addEventListener('dragstart', function (e) { e.preventDefault(); });
+});
+document.querySelectorAll('.unit').forEach(function (u) {
+  var img = u.querySelector('.pic img');
+  u.querySelectorAll('.form').forEach(function (b) {
+    b.addEventListener('click', function () {
+      u.querySelectorAll('.form').forEach(function (o) { o.classList.remove('on'); o.setAttribute('aria-pressed', 'false'); });
+      b.classList.add('on'); b.setAttribute('aria-pressed', 'true');
+      img.src = b.dataset.src;
+    });
+  });
+});
+</script>"""
     if lang == "en":
         # Deutschsprachige Browser landen auf der deutschen Startseite (Link „English“ führt mit ?en zurück).
         body += '<script>if(!location.search.includes("en")&&(navigator.language||"").toLowerCase().startsWith("de"))location.replace("de/");</script>'
