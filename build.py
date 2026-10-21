@@ -267,14 +267,20 @@ def form_label(text):
     return f'<span class="long">{word} </span>{num}' if word else text
 
 
+def gold_face(p, text):
+    """Goldene Fläche als Bild mit dunkler Schrift als Bildtext: Der Samsung-Browser färbt im Darkmode
+    CSS-Farben um (Gold wird braun), Bilder behalten ihren Farbton."""
+    return f'<img class="face" src="{p}img/ui/gold.png" alt="" aria-hidden="true"><span class="ink">{text}</span>'
+
+
 def home(lang):
     p = T[lang]["prefix"]
     h = HOME[lang]
     img = lambda n: f"{p}img/{lang}/{n}.jpg"
     beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
-    ctas = "".join(f'<a class="btn {kind}" href="{beta if href == "support.html" else href}">{label}</a>' for href, label, kind in h["cta"])
+    ctas = "".join(f'<a class="btn {kind}" href="{beta if href == "support.html" else href}">{gold_face(p, label) if kind == "gold" else label}</a>' for href, label, kind in h["cta"])
     facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
-    how = "".join(f'<li class="step"><span class="num">{i + 1}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
+    how = "".join(f'<li class="step"><span class="num">{gold_face(p, i + 1)}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
     feats = "".join(
         f'<article class="row{" flip" if i % 2 else ""}"><div class="shot"><img src="{img(n)}" alt="{t}" loading="lazy" width="720" height="1280"></div>'
         f'<div class="copy"><h3>{t}</h3><p>{x}</p></div></article>'
@@ -302,7 +308,7 @@ def home(lang):
 <main>
 <section class="hero">
 <div>
-<span class="tag">{h["tag"]}</span>
+<span class="tag">{gold_face(p, h["tag"])}</span>
 <h1>Bannerfall</h1>
 <p class="sub">Tiny Battle</p>
 <p class="lead">{h["lead"]}</p>
@@ -314,13 +320,13 @@ def home(lang):
 </div>
 </section>
 <section class="facts">{facts}</section>
-<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">‹</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">›</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
+<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">{gold_face(p, "‹")}</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">{gold_face(p, "›")}</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
 <section id="features"><h2>{h["features_title"]}</h2><div class="rows">{feats}</div></section>
 <section id="units"><h2>{h["units_title"]}</h2><p class="section-lead">{h["units_lead"]}</p><div class="units">{units}</div></section>
 <section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
 <section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
-<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="{beta}">{h["end_cta"]}</a></section>
+<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="{beta}">{gold_face(p, h["end_cta"])}</a></section>
 </main>"""
     # Slider: Pfeile blättern eine Bildbreite weiter, mit der Maus lässt er sich ziehen.
     # Einheiten: Klick auf eine Stufe tauscht das Bild.
