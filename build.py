@@ -177,7 +177,7 @@ HOME = {
         "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
         "beta_ios": ("iPhone", "Test via TestFlight"),
         "beta_android": ("Android", "Test on Google Play"),
-        "beta_note": "iPhone: install Apple’s free TestFlight app first. Android: join the tester group, then tap “Become a tester” and install from Google Play – please stay in the test for at least 14 days.",
+        "beta_note": "iPhone: install Apple’s free TestFlight app first. Android: join the tester group, then open <a href='https://play.google.com/apps/testing/de.jakobehmann.bannerfall'>this link</a>, tap “Become a tester” and install from Google Play – please stay in the test for at least 14 days.",
         "facts": [("18", "units to collect"), ("6", "worlds to conquer"), ("3", "spells to master"), ("1", "hero to lead them")],
         "how_title": "How a battle works",
         "how": [
@@ -228,7 +228,7 @@ HOME = {
         "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
         "beta_ios": ("iPhone", "Über TestFlight testen"),
         "beta_android": ("Android", "Bei Google Play testen"),
-        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren. Android: der Testergruppe beitreten, dann „Tester werden“ tippen und über Google Play installieren – bitte mindestens 14 Tage im Test bleiben.",
+        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren. Android: der Testergruppe beitreten, dann <a href='https://play.google.com/apps/testing/de.jakobehmann.bannerfall'>diesen Link</a> öffnen, „Tester werden“ tippen und über Google Play installieren – bitte mindestens 14 Tage im Test bleiben.",
         "facts": [("18", "Einheiten zum Sammeln"), ("6", "Welten zum Erobern"), ("3", "Zauber zum Meistern"), ("1", "Held, der sie anführt")],
         "how_title": "So läuft ein Kampf",
         "how": [
