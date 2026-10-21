@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTACT = "ehmannjakob@gmail.com"
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
-UPDATED = {"en": "October 20, 2026", "de": "20. Oktober 2026"}
+UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
 
 T = {
     "en": {
@@ -446,7 +446,7 @@ def imprint(lang):
 <p>{ADDRESS}</p>
 <p>Email: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>Business purpose</h2>
-<p>Development and distribution of software (game “Bannerfall: Tiny Battle” for iOS).</p>
+<p>Development and distribution of software (game “Bannerfall: Tiny Battle” for iOS and Android).</p>
 <h2>Editorial line (§ 25 MedienG)</h2>
 <p>This website provides information about the game “Bannerfall: Tiny Battle” as well as the related legal texts and support contact.</p>
 <h2>Online dispute resolution</h2>
@@ -463,7 +463,7 @@ def imprint(lang):
 <p>{ADDRESS.replace(" / Austria", "")}</p>
 <p>E-Mail: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>Unternehmensgegenstand</h2>
-<p>Entwicklung und Vertrieb von Software (Spiel „Bannerfall: Tiny Battle“ für iOS).</p>
+<p>Entwicklung und Vertrieb von Software (Spiel „Bannerfall: Tiny Battle“ für iOS und Android).</p>
 <h2>Blattlinie / Offenlegung (§ 25 MedienG)</h2>
 <p>Diese Website informiert über das Spiel „Bannerfall: Tiny Battle“ und stellt die zugehörigen Rechtstexte sowie Support-Kontaktmöglichkeiten bereit.</p>
 <h2>Online-Streitbeilegung</h2>
@@ -486,18 +486,18 @@ def privacy(lang):
         table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
         body = f"""<main class="doc">
 <h1>Privacy Policy</h1>
-<p class="note">For the iOS game “Bannerfall: Tiny Battle” and this website. Last updated: {UPDATED['en']}.</p>
+<p class="note">For the game “Bannerfall: Tiny Battle” (iOS and Android) and this website. Last updated: {UPDATED['en']}.</p>
 <h2>1. Controller</h2>
 <p>{ADDRESS}<br>Email: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>2. Data processed by the game</h2>
 <div class="table-scroll"><table><tr><th>Data</th><th>Purpose</th><th>Legal basis</th></tr>{table}</table></div>
-<p>The game does <strong>not</strong> collect your real name, email address, phone number, contacts or precise location. The game does not ask for permission to track you across apps (App Tracking Transparency); the advertising identifier (IDFA) is therefore not available to the game or to AdMob. Please don't use your real name as player name.</p>
+<p>The game does <strong>not</strong> collect your real name, email address, phone number, contacts or precise location. On iOS the game does not ask for permission to track you across apps (App Tracking Transparency); the advertising identifier (IDFA) is therefore not available to the game or to AdMob. On Android, AdMob may use the Android advertising ID (see section 4); you can reset or delete it at any time in your device settings. Please don't use your real name as player name.</p>
 <h2>3. Google Firebase</h2>
 <p>Save games, leaderboard entries and game events are stored with Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) in the data center <strong>Frankfurt am Main (europe-west3)</strong>. Google acts as processor. A transfer to third countries cannot be completely ruled out for Google services; Google relies on the EU-US Data Privacy Framework and standard contractual clauses.</p>
 <h2>4. Advertising (Google AdMob)</h2>
-<p>The game offers optional reward videos (e.g. to double the reward after a battle). These are provided by Google AdMob (Google Ireland Limited). When an ad is requested or shown, Google processes data such as your IP address, device and app information, the app-specific vendor identifier and your interactions with the ad, to deliver ads, measure them and prevent fraud. In the EU/EEA, the UK and Switzerland the game asks for your <strong>consent</strong> before personalized ads are shown (consent dialog by Google). Without consent, only non-personalized ads are shown. You can change your choice at any time under Settings → “Privacy settings” in the game. If you buy “Ad-free”, no ad videos are shown. More: <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from apps that use its services</a>.</p>
+<p>The game offers optional reward videos (e.g. to double the reward after a battle). These are provided by Google AdMob (Google Ireland Limited). When an ad is requested or shown, Google processes data such as your IP address, device and app information, the app-specific vendor identifier (iOS) or the Android advertising ID (Android) and your interactions with the ad, to deliver ads, measure them and prevent fraud. In the EU/EEA, the UK and Switzerland the game asks for your <strong>consent</strong> before personalized ads are shown (consent dialog by Google). Without consent, only non-personalized ads are shown. You can change your choice at any time under Settings → “Privacy settings” in the game. If you buy “Ad-free”, no ad videos are shown. More: <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from apps that use its services</a>.</p>
 <h2>5. In-app purchases</h2>
-<p>Purchases are processed exclusively by Apple (App Store). We do not receive your payment details; we only receive confirmation of which product was bought, to credit it in the game.</p>
+<p>Purchases are processed exclusively by Apple (App Store) or Google (Google Play). We do not receive your payment details; we only receive confirmation of which product was bought, to credit it in the game.</p>
 <h2>6. Retention</h2>
 <p>Save game, leaderboard entry and game events are stored as long as the player ID is used and deleted no later than 24 months after the last use. Transfer codes expire after 24 hours.</p>
 <h2>7. Your rights</h2>
@@ -521,18 +521,18 @@ def privacy(lang):
         table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
         body = f"""<main class="doc">
 <h1>Datenschutzerklärung</h1>
-<p class="note">Für das iOS-Spiel „Bannerfall: Tiny Battle“ und diese Website. Stand: {UPDATED['de']}.</p>
+<p class="note">Für das Spiel „Bannerfall: Tiny Battle“ (iOS und Android) und diese Website. Stand: {UPDATED['de']}.</p>
 <h2>1. Verantwortlicher</h2>
 <p>{ADDRESS.replace(" / Austria", "")}<br>E-Mail: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>2. Welche Daten das Spiel verarbeitet</h2>
 <div class="table-scroll"><table><tr><th>Daten</th><th>Zweck</th><th>Rechtsgrundlage</th></tr>{table}</table></div>
-<p>Das Spiel erhebt <strong>keine</strong> echten Namen, E-Mail-Adressen, Telefonnummern, Kontakte oder genauen Standortdaten. Das Spiel fragt nicht nach der Erlaubnis, dich app-übergreifend zu verfolgen (App Tracking Transparency); die Werbe-ID (IDFA) steht dem Spiel und AdMob daher nicht zur Verfügung. Bitte verwende keinen echten Namen als Spielernamen.</p>
+<p>Das Spiel erhebt <strong>keine</strong> echten Namen, E-Mail-Adressen, Telefonnummern, Kontakte oder genauen Standortdaten. Unter iOS fragt das Spiel nicht nach der Erlaubnis, dich app-übergreifend zu verfolgen (App Tracking Transparency); die Werbe-ID (IDFA) steht dem Spiel und AdMob daher nicht zur Verfügung. Unter Android kann AdMob die Android-Werbe-ID verwenden (siehe Abschnitt 4); du kannst sie jederzeit in den Geräteeinstellungen zurücksetzen oder löschen. Bitte verwende keinen echten Namen als Spielernamen.</p>
 <h2>3. Google Firebase</h2>
 <p>Spielstände, Ranglisten-Einträge und Spielereignisse werden bei Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im Rechenzentrum <strong>Frankfurt am Main (europe-west3)</strong> gespeichert. Google ist Auftragsverarbeiter. Eine Übermittlung in Drittländer kann bei Google-Diensten nicht vollständig ausgeschlossen werden; Google stützt sich dafür auf das EU-US Data Privacy Framework und Standardvertragsklauseln.</p>
 <h2>4. Werbung (Google AdMob)</h2>
-<p>Das Spiel bietet freiwillige Belohnungs-Videos an (z. B. um die Belohnung nach einem Kampf zu verdoppeln). Diese stammen von Google AdMob (Google Ireland Limited). Beim Anfordern und Anzeigen einer Anzeige verarbeitet Google Daten wie IP-Adresse, Geräte- und App-Informationen, die app-spezifische Hersteller-Kennung und deine Interaktionen mit der Anzeige, um Anzeigen auszuliefern, zu messen und Betrug zu verhindern. In der EU/im EWR, im Vereinigten Königreich und in der Schweiz fragt das Spiel vor personalisierter Werbung nach deiner <strong>Einwilligung</strong> (Einwilligungsdialog von Google). Ohne Einwilligung werden nur nicht personalisierte Anzeigen gezeigt. Deine Auswahl kannst du jederzeit im Spiel unter Einstellungen → „Datenschutz-Einstellungen“ ändern. Mit „Werbefrei“ werden keine Werbevideos angezeigt. Mehr dazu: <a href="https://policies.google.com/technologies/partner-sites?hl=de">Wie Google Daten aus Apps verwendet</a>.</p>
+<p>Das Spiel bietet freiwillige Belohnungs-Videos an (z. B. um die Belohnung nach einem Kampf zu verdoppeln). Diese stammen von Google AdMob (Google Ireland Limited). Beim Anfordern und Anzeigen einer Anzeige verarbeitet Google Daten wie IP-Adresse, Geräte- und App-Informationen, die app-spezifische Hersteller-Kennung (iOS) bzw. die Android-Werbe-ID (Android) und deine Interaktionen mit der Anzeige, um Anzeigen auszuliefern, zu messen und Betrug zu verhindern. In der EU/im EWR, im Vereinigten Königreich und in der Schweiz fragt das Spiel vor personalisierter Werbung nach deiner <strong>Einwilligung</strong> (Einwilligungsdialog von Google). Ohne Einwilligung werden nur nicht personalisierte Anzeigen gezeigt. Deine Auswahl kannst du jederzeit im Spiel unter Einstellungen → „Datenschutz-Einstellungen“ ändern. Mit „Werbefrei“ werden keine Werbevideos angezeigt. Mehr dazu: <a href="https://policies.google.com/technologies/partner-sites?hl=de">Wie Google Daten aus Apps verwendet</a>.</p>
 <h2>5. Käufe im Spiel</h2>
-<p>Käufe werden ausschließlich von Apple (App Store) abgewickelt. Wir erhalten keine Zahlungsdaten, sondern nur die Bestätigung, welches Produkt gekauft wurde, um es im Spiel gutzuschreiben.</p>
+<p>Käufe werden ausschließlich von Apple (App Store) bzw. Google (Google Play) abgewickelt. Wir erhalten keine Zahlungsdaten, sondern nur die Bestätigung, welches Produkt gekauft wurde, um es im Spiel gutzuschreiben.</p>
 <h2>6. Speicherdauer</h2>
 <p>Spielstand, Ranglisten-Eintrag und Spielereignisse werden gespeichert, solange die Spieler-Kennung genutzt wird, und spätestens 24 Monate nach der letzten Nutzung gelöscht. Übertragungscodes verfallen nach 24 Stunden.</p>
 <h2>7. Deine Rechte</h2>
