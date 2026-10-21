@@ -63,46 +63,135 @@ def page(lang, file, title, body, description=""):
         f.write(html)
 
 
+HOME = {
+    "en": {
+        "tag": "Coming soon to iPhone · Android to follow",
+        "lead": "Build your army, upgrade your heroes and storm the enemy castle. A cute but tactical lane battle game – easy to pick up, hard to master.",
+        "cta": [("support.html", "Join the beta", "gold"), ("#features", "Discover the game", "ghost")],
+        "facts": [("18", "units to collect"), ("6", "worlds to conquer"), ("3", "spells to master"), ("1", "hero to lead them")],
+        "how_title": "How a battle works",
+        "how": [
+            ("Pick your deck", "Choose up to six units before the battle – tanks up front, archers and mages behind."),
+            ("Choose your cards", "Every level-up in battle offers three cards: new units, upgrades, abilities or spells. No two battles play the same."),
+            ("Storm the castle", "Hold off the waves, break the enemy line and tear down their castle before yours falls."),
+        ],
+        "features_title": "What awaits you",
+        "features": [
+            ("battle", "Swarm battles", "Waves of goblins, orcs and the undead crash into your army. Hold the line, then break through when the battle frenzy begins and every castle takes extra damage."),
+            ("spell", "Rain fire from the sky", "Time your spells: fire rain scorches whole groups, ice rain freezes waves in place, battle blessing drives your troops into a frenzy. Every spell grows stronger with you."),
+            ("cards", "A new choice every level", "Each battle builds up differently. Do you bring in a new unit, make your samurai stronger or unlock a special ability? Rare epic choices can turn a lost battle around."),
+            ("unit", "Collect, level up, ascend", "Find unit parts in battles and chests, level your units up and ascend them twice – they visibly transform and learn new abilities. Forge weapons with fire, ice, poison, lightning or light."),
+            ("home", "A long campaign", "Fight through six worlds from green meadows to the land of the undead and beyond, with boss stages at the end of each chapter. Expand your village and test yourself in the boss dungeon."),
+            ("victory", "Rewards that matter", "Every win brings gold, unit parts and materials. Daily quests, chests and the leaderboard keep you coming back for one more battle."),
+        ],
+        "fair_title": "Fair to play",
+        "fair": [
+            ("Free to play", "The whole campaign can be played without paying."),
+            ("No forced ads", "Videos only when you choose them – for example to double a reward. Or buy “Ad-free” once."),
+            ("No energy system", "Play as many battles as you like, whenever you like."),
+            ("Your progress is safe", "Cloud backup and a transfer code for your next phone."),
+        ],
+        "shots_title": "Screenshots",
+        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
+        "faq_title": "Questions",
+        "faq": [
+            ("When does Bannerfall come out?", "We're currently testing the game with a small group of players on TestFlight. The App Store release follows once the feedback is in – follow along or join the beta."),
+            ("Is there an Android version?", "Yes, Android is in the works and will follow shortly after the iPhone release."),
+            ("Does the game cost anything?", "No. Bannerfall is free. There are optional purchases like gem packs, a battle pass and “Ad-free”, but everything can be reached by playing."),
+            ("Which languages are supported?", "English and German. The game follows your device language and can be switched in the settings."),
+            ("Who makes Bannerfall?", "Bannerfall is an indie game by Jakob Ehmann from Austria."),
+        ],
+        "end_title": "Want to play before everyone else?",
+        "end_text": "Send a short email and we'll invite you to the TestFlight beta. Your feedback shapes the game.",
+        "end_cta": "Join the beta",
+    },
+    "de": {
+        "tag": "Bald fürs iPhone · Android folgt",
+        "lead": "Stell deine Armee zusammen, werte deine Helden auf und stürme die gegnerische Burg. Ein niedliches, aber taktisches Lane-Battle-Spiel – schnell gelernt, schwer gemeistert.",
+        "cta": [("support.html", "Beim Betatest mitmachen", "gold"), ("#features", "Spiel entdecken", "ghost")],
+        "facts": [("18", "Einheiten zum Sammeln"), ("6", "Welten zum Erobern"), ("3", "Zauber zum Meistern"), ("1", "Held, der sie anführt")],
+        "how_title": "So läuft ein Kampf",
+        "how": [
+            ("Deck wählen", "Nimm bis zu sechs Einheiten mit in den Kampf – vorne die Tanks, dahinter Bogenschützen und Magier."),
+            ("Karten ziehen", "Bei jedem Stufenaufstieg im Kampf wählst du aus drei Karten: neue Einheiten, Verbesserungen, Fähigkeiten oder Zauber. Kein Kampf läuft gleich."),
+            ("Burg stürmen", "Halte die Wellen auf, durchbrich die Linie des Gegners und reiß seine Burg nieder, bevor deine fällt."),
+        ],
+        "features_title": "Was dich erwartet",
+        "features": [
+            ("battle", "Schwarm-Schlachten", "Wellen aus Goblins, Orks und Untoten prallen auf deine Armee. Halte die Linie und brich durch, sobald der Kampfrausch beginnt und jede Burg mehr Schaden nimmt."),
+            ("spell", "Feuer vom Himmel", "Setz deine Zauber im richtigen Moment: Feuerregen verbrennt ganze Gruppen, Eisregen friert Wellen ein, der Schlachtsegen treibt deine Truppen an. Jeder Zauber wächst mit dir."),
+            ("cards", "Jede Stufe eine neue Wahl", "Jeder Kampf entwickelt sich anders. Holst du eine neue Einheit, machst du deinen Samurai stärker oder schaltest eine Spezialfähigkeit frei? Seltene epische Wahlen drehen auch verlorene Kämpfe."),
+            ("unit", "Sammeln, aufwerten, aufsteigen", "Sammle Einheiten-Teile in Kämpfen und Truhen, werte deine Einheiten auf und lass sie zweimal aufsteigen – sie verwandeln sich sichtbar und lernen neue Fähigkeiten. Schmiede Waffen mit Feuer, Eis, Gift, Blitz oder Licht."),
+            ("home", "Eine lange Kampagne", "Kämpf dich durch sechs Welten, von der grünen Wiese bis ins Land der Untoten und weiter, mit Bossstufen am Ende jedes Kapitels. Bau dein Dorf aus und stell dich dem Boss-Verlies."),
+            ("victory", "Belohnungen, die zählen", "Jeder Sieg bringt Gold, Einheiten-Teile und Material. Tägliche Aufgaben, Truhen und die Rangliste sorgen für „nur noch einen Kampf“."),
+        ],
+        "fair_title": "Fair spielbar",
+        "fair": [
+            ("Kostenlos", "Die ganze Kampagne ist ohne Bezahlen spielbar."),
+            ("Keine Zwangswerbung", "Videos nur, wenn du willst – etwa um eine Belohnung zu verdoppeln. Oder einmal „Werbefrei“ kaufen."),
+            ("Kein Energiesystem", "Spiel so viele Kämpfe, wie du willst, wann du willst."),
+            ("Dein Fortschritt ist sicher", "Sicherung in der Cloud und ein Übertragungscode fürs nächste Handy."),
+        ],
+        "shots_title": "Bilder aus dem Spiel",
+        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
+        "faq_title": "Fragen",
+        "faq": [
+            ("Wann erscheint Bannerfall?", "Gerade testen wir das Spiel mit einer kleinen Gruppe über TestFlight. Der Start im App Store folgt, sobald das Feedback eingearbeitet ist – mach mit beim Betatest."),
+            ("Gibt es eine Android-Version?", "Ja, Android ist in Arbeit und folgt kurz nach dem iPhone-Start."),
+            ("Kostet das Spiel etwas?", "Nein. Bannerfall ist kostenlos. Es gibt freiwillige Käufe wie Edelstein-Pakete, einen Kampfpass und „Werbefrei“, aber alles ist auch durchs Spielen erreichbar."),
+            ("Welche Sprachen gibt es?", "Deutsch und Englisch. Das Spiel folgt der Sprache deines Geräts und lässt sich in den Einstellungen umstellen."),
+            ("Wer steckt hinter Bannerfall?", "Bannerfall ist ein Indie-Spiel von Jakob Ehmann aus Österreich."),
+        ],
+        "end_title": "Willst du vor allen anderen spielen?",
+        "end_text": "Schreib uns kurz, dann laden wir dich zum TestFlight-Betatest ein. Dein Feedback formt das Spiel.",
+        "end_cta": "Beim Betatest mitmachen",
+    },
+}
+
+
 def home(lang):
     p = T[lang]["prefix"]
-    if lang == "en":
-        tag, lead = "Coming soon to iPhone", "Build your army, upgrade your heroes and storm the enemy castle. A cute but tactical lane battle game – easy to pick up, hard to master."
-        cta = ("support.html", "Contact & beta")
-        features = [
-            ("Swarm battles", "Waves of goblins, orcs and the undead crash into your army. Hold the line, then break through when the battle frenzy begins."),
-            ("Collect & ascend", "Unlock knights, mages, samurai and more. Level them up, equip weapons with elements and watch them transform."),
-            ("Spells & hero", "Rain fire on the enemy, freeze whole waves and call your captain to rally the troops at the right moment."),
-        ]
-        shots_title = "Screenshots"
-    else:
-        tag, lead = "Bald fürs iPhone", "Stell deine Armee zusammen, werte deine Helden auf und stürme die gegnerische Burg. Ein niedliches, aber taktisches Lane-Battle-Spiel – schnell gelernt, schwer gemeistert."
-        cta = ("support.html", "Kontakt & Beta")
-        features = [
-            ("Schwarm-Schlachten", "Wellen aus Goblins, Orks und Untoten prallen auf deine Armee. Halte die Linie und brich durch, sobald der Kampfrausch beginnt."),
-            ("Sammeln & aufsteigen", "Schalte Ritter, Magier, Samurai und mehr frei. Werte sie auf, gib ihnen Waffen mit Elementen und sieh zu, wie sie sich verwandeln."),
-            ("Zauber & Held", "Lass Feuer regnen, friere ganze Wellen ein und ruf deinen Hauptmann im richtigen Moment aufs Feld."),
-        ]
-        shots_title = "Bilder aus dem Spiel"
-    feats = "".join(f'<div class="feature"><h3>{h}</h3><p>{x}</p></div>' for h, x in features)
-    shots = "".join(f'<img src="{p}img/{n}.jpg" alt="Bannerfall" loading="lazy" width="506" height="900">' for n in ["battle", "units", "unit", "cards"])
+    h = HOME[lang]
+    img = lambda n: f"{p}img/{lang}/{n}.jpg"
+    beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
+    ctas = "".join(f'<a class="btn {kind}" href="{beta if href == "support.html" else href}">{label}</a>' for href, label, kind in h["cta"])
+    facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
+    how = "".join(f'<li class="step"><span class="num">{i + 1}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
+    feats = "".join(
+        f'<article class="row{" flip" if i % 2 else ""}"><div class="shot"><img src="{img(n)}" alt="{t}" loading="lazy" width="720" height="1280"></div>'
+        f'<div class="copy"><h3>{t}</h3><p>{x}</p></div></article>'
+        for i, (n, t, x) in enumerate(h["features"])
+    )
+    fair = "".join(f'<div class="feature"><h3>{t}</h3><p>{x}</p></div>' for t, x in h["fair"])
+    shots = "".join(f'<img src="{img(n)}" alt="Bannerfall" loading="lazy" width="720" height="1280">' for n in h["shots"])
+    faq = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in h["faq"])
     body = f"""
 <main>
 <section class="hero">
 <div>
-<span class="tag">{tag}</span>
+<span class="tag">{h["tag"]}</span>
 <h1>Bannerfall</h1>
-<p class="lead">{lead}</p>
-<div class="cta"><a class="btn gold" href="{cta[0]}">{cta[1]}</a></div>
+<p class="sub">Tiny Battle</p>
+<p class="lead">{h["lead"]}</p>
+<div class="cta">{ctas}</div>
 </div>
-<div class="phone"><img src="{p}img/battle.jpg" alt="Bannerfall" width="506" height="900"></div>
+<div class="phones">
+<div class="phone back"><img src="{img("spell")}" alt="" width="720" height="1280"></div>
+<div class="phone"><img src="{img("battle")}" alt="Bannerfall" width="720" height="1280"></div>
+</div>
 </section>
-<section><div class="features">{feats}</div></section>
-<section><h2>{shots_title}</h2><div class="shots">{shots}</div></section>
+<section class="facts">{facts}</section>
+<section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
+<section id="features"><h2>{h["features_title"]}</h2><div class="rows">{feats}</div></section>
+<section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
+<section><h2>{h["shots_title"]}</h2><div class="gallery">{shots}</div></section>
+<section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
+<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="{beta}">{h["end_cta"]}</a></section>
 </main>"""
     if lang == "en":
         # Deutschsprachige Browser landen auf der deutschen Startseite (Link „English“ führt mit ?en zurück).
         body += '<script>if(!location.search.includes("en")&&(navigator.language||"").toLowerCase().startsWith("de"))location.replace("de/");</script>'
-    page(lang, "index.html", "Bannerfall: Tiny Battle", body, lead)
+    page(lang, "index.html", "Bannerfall: Tiny Battle", body, h["lead"])
 
 
 def support(lang):

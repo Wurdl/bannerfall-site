@@ -135,6 +135,150 @@ h2 { font-size: 34px; margin: 0 0 18px; }
   display: block;
 }
 
+/* Startseite: zwei Handys, Zahlen, Ablauf, Funktionen im Wechsel, Galerie, Fragen */
+.hero .sub {
+  margin: 0 0 18px;
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.phones { position: relative; justify-self: center; width: min(400px, 88vw); }
+.phones .phone { position: relative; z-index: 1; margin-left: auto; width: 78%; }
+.phones .phone.back {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 10%;
+  width: 62%;
+  transform: rotate(-7deg);
+  opacity: 0.9;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding: 8px 0 28px;
+}
+.fact {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 14px;
+  text-align: center;
+}
+.fact b { display: block; font-size: 46px; line-height: 1; color: var(--gold); text-shadow: 0 3px 0 var(--ink); }
+.fact span { color: var(--muted); font-size: 16px; }
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  counter-reset: none;
+}
+.step {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 20px 20px;
+}
+.step .num {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 22px;
+  border: 3px solid var(--ink);
+  margin-bottom: 10px;
+}
+.step h3 { margin: 0 0 6px; font-size: 22px; }
+.step p { margin: 0; color: var(--muted); }
+
+.rows { display: grid; gap: 28px; }
+.row {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 44px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  padding: 28px 40px;
+}
+.row.flip { grid-template-columns: 1fr 260px; }
+.row.flip .shot { order: 2; }
+.row .shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+  border: 5px solid var(--ink);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+.row h3 { font-size: clamp(28px, 3.4vw, 38px); margin: 0 0 10px; line-height: 1.1; }
+.row p { margin: 0; font-size: 20px; color: var(--muted); max-width: 30em; }
+
+.features.four { grid-template-columns: repeat(4, 1fr); }
+
+.gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 220px;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 12px;
+  scrollbar-color: var(--gold) transparent;
+}
+.gallery img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 4px solid var(--ink);
+  display: block;
+  scroll-snap-align: start;
+}
+
+.faq details {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+.faq summary {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 20px;
+  padding: 16px 0;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; float: right; color: var(--gold); font-size: 26px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { margin: 0 0 18px; color: var(--muted); }
+
+.final {
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255, 211, 77, 0.18), rgba(255, 211, 77, 0.05));
+  border: 2px solid rgba(255, 211, 77, 0.45);
+  border-radius: 28px;
+  padding: 44px 24px;
+  margin: 24px 0 48px;
+}
+.final h2 { font-size: clamp(28px, 4vw, 40px); }
+.final p { color: var(--muted); max-width: 34em; margin: 0 auto 22px; }
+
 /* Textseiten (Datenschutz, Impressum, Support) */
 .doc {
   background: var(--paper);
@@ -170,4 +314,14 @@ footer a { color: var(--muted); }
   .features { grid-template-columns: 1fr; }
   .shots { grid-template-columns: repeat(2, 1fr); }
   .top nav { gap: 12px; }
+  .hero .sub { margin-bottom: 12px; }
+  .phones { width: min(340px, 86vw); margin-top: 8px; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .fact b { font-size: 38px; }
+  .steps, .features.four { grid-template-columns: 1fr; }
+  .row, .row.flip { grid-template-columns: 1fr; gap: 20px; padding: 22px 18px; text-align: center; }
+  .row.flip .shot { order: 0; }
+  .row .shot { width: min(260px, 70vw); margin: 0 auto; }
+  .row p { margin: 0 auto; font-size: 18px; }
+  .gallery { grid-auto-columns: 62vw; }
 }
