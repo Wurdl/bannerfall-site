@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light dark;
   --sky: #2f7ff0;
   --deep: #0b2a7a;
   --night: #071a4d;
@@ -418,4 +419,11 @@ footer a { color: var(--muted); }
   .unit p { font-size: 14px; }
   .unit ul { font-size: 13px; }
   .unit li span, .unit .form .long { display: none; }
+}
+
+/* Eigene Darstellung für den Darkmode = dieselbe wie hell. Die Abfrage zeigt Browsern mit Zwangs-Darkmode
+   (Samsung Internet), dass die Seite den Darkmode selbst behandelt und nicht umgefärbt werden soll. */
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: light dark; }
+  body { background: linear-gradient(180deg, var(--sky) 0%, var(--deep) 38%, var(--night) 100%); background-attachment: fixed; }
 }
