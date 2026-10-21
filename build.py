@@ -6,6 +6,9 @@ import os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTACT = "ehmannjakob@gmail.com"
+# Beta-Links: öffentlicher TestFlight-Link (iOS) und Beitrittsseite der Google Group (Android). Leer = Anmeldung per E-Mail.
+TESTFLIGHT_URL = "https://testflight.apple.com/join/FJttqMWU"
+ANDROID_BETA_URL = ""
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
@@ -167,9 +170,14 @@ UNITS = [
 
 HOME = {
     "en": {
-        "tag": "Coming soon to iPhone · Android to follow",
+        "tag": "Beta now open · iPhone & Android",
         "lead": "Build your army, upgrade your heroes and storm the enemy castle. A cute but tactical lane battle game – easy to pick up, hard to master.",
-        "cta": [("support.html", "Join the beta", "gold"), ("#features", "Discover the game", "ghost")],
+        "cta": [("#beta", "Join the beta", "gold"), ("#features", "Discover the game", "ghost")],
+        "beta_title": "Play the beta now",
+        "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
+        "beta_ios": ("iPhone", "Test via TestFlight"),
+        "beta_android": ("Android", "Test on Google Play"),
+        "beta_note": "iPhone: install Apple’s free TestFlight app first. Android: join the tester group, then tap “Become a tester” and install from Google Play – please stay in the test for at least 14 days.",
         "facts": [("18", "units to collect"), ("6", "worlds to conquer"), ("3", "spells to master"), ("1", "hero to lead them")],
         "how_title": "How a battle works",
         "how": [
@@ -203,19 +211,24 @@ HOME = {
         "faq_title": "Questions",
         "faq": [
             ("When does Bannerfall come out?", "We're currently testing the game with a small group of players on TestFlight. The App Store release follows once the feedback is in – follow along or join the beta."),
-            ("Is there an Android version?", "Yes, Android is in the works and will follow shortly after the iPhone release."),
+            ("Is there an Android version?", "Yes! The Android beta runs on Google Play – use the Android button at the top of this page."),
             ("Does the game cost anything?", "No. Bannerfall is free. There are optional purchases like gem packs, a battle pass and “Ad-free”, but everything can be reached by playing."),
             ("Which languages are supported?", "English and German. The game follows your device language and can be switched in the settings."),
             ("Who makes Bannerfall?", "Bannerfall is an indie game by Jakob Ehmann from Austria."),
         ],
         "end_title": "Want to play before everyone else?",
-        "end_text": "Send a short email and we'll invite you to the TestFlight beta. Your feedback shapes the game.",
+        "end_text": "Join the beta on iPhone or Android – it only takes a minute. Your feedback shapes the game.",
         "end_cta": "Join the beta",
     },
     "de": {
-        "tag": "Bald fürs iPhone · Android folgt",
+        "tag": "Betatest läuft · iPhone & Android",
         "lead": "Stell deine Armee zusammen, werte deine Helden auf und stürme die gegnerische Burg. Ein niedliches, aber taktisches Lane-Battle-Spiel – schnell gelernt, schwer gemeistert.",
-        "cta": [("support.html", "Beim Betatest mitmachen", "gold"), ("#features", "Spiel entdecken", "ghost")],
+        "cta": [("#beta", "Beim Betatest mitmachen", "gold"), ("#features", "Spiel entdecken", "ghost")],
+        "beta_title": "Jetzt die Beta spielen",
+        "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
+        "beta_ios": ("iPhone", "Über TestFlight testen"),
+        "beta_android": ("Android", "Bei Google Play testen"),
+        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren. Android: der Testergruppe beitreten, dann „Tester werden“ tippen und über Google Play installieren – bitte mindestens 14 Tage im Test bleiben.",
         "facts": [("18", "Einheiten zum Sammeln"), ("6", "Welten zum Erobern"), ("3", "Zauber zum Meistern"), ("1", "Held, der sie anführt")],
         "how_title": "So läuft ein Kampf",
         "how": [
@@ -249,13 +262,13 @@ HOME = {
         "faq_title": "Fragen",
         "faq": [
             ("Wann erscheint Bannerfall?", "Gerade testen wir das Spiel mit einer kleinen Gruppe über TestFlight. Der Start im App Store folgt, sobald das Feedback eingearbeitet ist – mach mit beim Betatest."),
-            ("Gibt es eine Android-Version?", "Ja, Android ist in Arbeit und folgt kurz nach dem iPhone-Start."),
+            ("Gibt es eine Android-Version?", "Ja! Die Android-Beta läuft über Google Play – nimm einfach den Android-Knopf oben auf dieser Seite."),
             ("Kostet das Spiel etwas?", "Nein. Bannerfall ist kostenlos. Es gibt freiwillige Käufe wie Edelstein-Pakete, einen Kampfpass und „Werbefrei“, aber alles ist auch durchs Spielen erreichbar."),
             ("Welche Sprachen gibt es?", "Deutsch und Englisch. Das Spiel folgt der Sprache deines Geräts und lässt sich in den Einstellungen umstellen."),
             ("Wer steckt hinter Bannerfall?", "Bannerfall ist ein Indie-Spiel von Jakob Ehmann aus Österreich."),
         ],
         "end_title": "Willst du vor allen anderen spielen?",
-        "end_text": "Schreib uns kurz, dann laden wir dich zum TestFlight-Betatest ein. Dein Feedback formt das Spiel.",
+        "end_text": "Mach beim Betatest mit, auf dem iPhone oder unter Android – das dauert nur eine Minute. Dein Feedback formt das Spiel.",
         "end_cta": "Beim Betatest mitmachen",
     },
 }
@@ -278,7 +291,12 @@ def home(lang):
     h = HOME[lang]
     img = lambda n: f"{p}img/{lang}/{n}.jpg"
     beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
-    ctas = "".join(f'<a class="btn {kind}" href="{beta if href == "support.html" else href}">{gold_face(p, label) if kind == "gold" else label}</a>' for href, label, kind in h["cta"])
+    ios_url = TESTFLIGHT_URL or beta + "%20iPhone"
+    android_url = ANDROID_BETA_URL or beta + "%20Android"
+    store = lambda cls, url, label: (f'<a class="btn gold store {cls}" href="{url}">'
+                                     + gold_face(p, f'<small>{label[0]}</small><b>{label[1]}</b>') + '</a>')
+    beta_btns = store("ios", ios_url, h["beta_ios"]) + store("android", android_url, h["beta_android"])
+    ctas = "".join(f'<a class="btn {kind}" href="{href}">{gold_face(p, label) if kind == "gold" else label}</a>' for href, label, kind in h["cta"])
     facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
     how = "".join(f'<li class="step"><span class="num">{gold_face(p, i + 1)}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
     feats = "".join(
@@ -319,6 +337,7 @@ def home(lang):
 <div class="phone"><img src="{img("battle")}" alt="Bannerfall" width="720" height="1280"></div>
 </div>
 </section>
+<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="beta-btns">{beta_btns}</div><p class="beta-note">{h["beta_note"]}</p></section>
 <section class="facts">{facts}</section>
 <section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">{gold_face(p, "‹")}</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">{gold_face(p, "›")}</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
@@ -326,11 +345,17 @@ def home(lang):
 <section id="units"><h2>{h["units_title"]}</h2><p class="section-lead">{h["units_lead"]}</p><div class="units">{units}</div></section>
 <section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
 <section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
-<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="{beta}">{gold_face(p, h["end_cta"])}</a></section>
+<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="#beta">{gold_face(p, h["end_cta"])}</a></section>
 </main>"""
     # Slider: Pfeile blättern eine Bildbreite weiter, mit der Maus lässt er sich ziehen.
     # Einheiten: Klick auf eine Stufe tauscht das Bild.
     body += """<script>
+// Beta-Knopf des eigenen Handys hervorheben und nach vorne holen.
+(function () {
+  var ua = navigator.userAgent, mine = /android/i.test(ua) ? 'android' : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && 'ontouchend' in document)) ? 'ios' : '';
+  var b = mine && document.querySelector('.store.' + mine);
+  if (b) { b.classList.add('mine'); b.parentNode.prepend(b); }
+})();
 document.querySelectorAll('.slider').forEach(function (s) {
   var g = s.querySelector('.gallery');
   var imgs = g.querySelectorAll('img');
