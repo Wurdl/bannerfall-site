@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTACT = "ehmannjakob@gmail.com"
 # Beta-Links: öffentlicher TestFlight-Link (iOS) und Beitrittsseite der Google Group (Android). Leer = Anmeldung per E-Mail.
 TESTFLIGHT_URL = "https://testflight.apple.com/join/FJttqMWU"
-ANDROID_BETA_URL = ""
+ANDROID_BETA_URL = "https://groups.google.com/g/bannerfall-tester"
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
@@ -172,7 +172,7 @@ HOME = {
     "en": {
         "tag": "Beta now open · iPhone & Android",
         "lead": "Build your army, upgrade your heroes and storm the enemy castle. A cute but tactical lane battle game – easy to pick up, hard to master.",
-        "cta": [("#beta", "Join the beta", "gold"), ("#features", "Discover the game", "ghost")],
+        "cta": [("#features", "Discover the game", "ghost")],
         "beta_title": "Play the beta now",
         "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
         "beta_ios": ("iPhone", "Test via TestFlight"),
@@ -223,7 +223,7 @@ HOME = {
     "de": {
         "tag": "Betatest läuft · iPhone & Android",
         "lead": "Stell deine Armee zusammen, werte deine Helden auf und stürme die gegnerische Burg. Ein niedliches, aber taktisches Lane-Battle-Spiel – schnell gelernt, schwer gemeistert.",
-        "cta": [("#beta", "Beim Betatest mitmachen", "gold"), ("#features", "Spiel entdecken", "ghost")],
+        "cta": [("#features", "Spiel entdecken", "ghost")],
         "beta_title": "Jetzt die Beta spielen",
         "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
         "beta_ios": ("iPhone", "Über TestFlight testen"),
