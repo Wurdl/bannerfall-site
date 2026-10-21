@@ -230,24 +230,38 @@ h2 { font-size: 34px; margin: 0 0 18px; }
 
 .features.four { grid-template-columns: repeat(4, 1fr); }
 
+/* Bilder-Slider: waagrecht wischen, Pfeile und Punkte darunter */
 .gallery {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 220px;
+  display: flex;
   gap: 14px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding-bottom: 12px;
-  scrollbar-color: var(--gold) transparent;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 4px 0 6px;
 }
+.gallery::-webkit-scrollbar { display: none; }
 .gallery img {
-  width: 100%;
+  flex: 0 0 220px;
+  width: 220px;
   height: auto;
   border-radius: 18px;
   border: 4px solid var(--ink);
   display: block;
   scroll-snap-align: start;
 }
+.dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+.dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: width 0.2s, background 0.2s;
+}
+.dot.on { width: 26px; background: var(--gold); }
 
 .slider-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .slider-head h2 { margin: 0; }
@@ -265,7 +279,7 @@ h2 { font-size: 34px; margin: 0 0 18px; }
   box-shadow: 0 4px 0 var(--ink);
 }
 .arrow:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
-.gallery { cursor: grab; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.gallery { cursor: grab; }
 .gallery.drag { cursor: grabbing; scroll-snap-type: none; }
 .gallery.drag img { pointer-events: none; }
 .gallery img { user-select: none; }
@@ -393,7 +407,8 @@ footer a { color: var(--muted); }
   .row.flip .shot { order: 0; }
   .row .shot { width: min(260px, 70vw); margin: 0 auto; }
   .row p { margin: 0 auto; font-size: 18px; }
-  .gallery { grid-auto-columns: 62vw; }
+  .gallery { margin: 0 -20px; padding-left: 20px; padding-right: 20px; scroll-padding: 0 20px; cursor: auto; }
+  .gallery img { flex-basis: 74vw; width: 74vw; max-width: 320px; }
   .arrow { width: 42px; height: 42px; font-size: 26px; }
   .units { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .unit { padding: 10px 10px 14px; border-radius: 16px; }

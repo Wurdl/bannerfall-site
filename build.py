@@ -196,7 +196,7 @@ HOME = {
         "forms": ["Base", "Ascension I", "Ascension II"],
         "ranged": ("Ranged", "Melee"),
         "prev": "Previous", "next": "Next",
-        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
+        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory"],
         "faq_title": "Questions",
         "faq": [
             ("When does Bannerfall come out?", "We're currently testing the game with a small group of players on TestFlight. The App Store release follows once the feedback is in – follow along or join the beta."),
@@ -242,7 +242,7 @@ HOME = {
         "forms": ["Basis", "Aufstieg I", "Aufstieg II"],
         "ranged": ("Fernkampf", "Nahkampf"),
         "prev": "Zurück", "next": "Weiter",
-        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory", "shop"],
+        "shots": ["battle", "spell", "cards", "unit", "units", "home", "victory"],
         "faq_title": "Fragen",
         "faq": [
             ("Wann erscheint Bannerfall?", "Gerade testen wir das Spiel mit einer kleinen Gruppe über TestFlight. Der Start im App Store folgt, sobald das Feedback eingearbeitet ist – mach mit beim Betatest."),
@@ -279,6 +279,7 @@ def home(lang):
     )
     fair = "".join(f'<div class="feature"><h3>{t}</h3><p>{x}</p></div>' for t, x in h["fair"])
     shots = "".join(f'<img src="{img(n)}" alt="Bannerfall" loading="lazy" width="720" height="1280">' for n in h["shots"])
+    dots = "".join(f'<button type="button" class="dot{" on" if i == 0 else ""}" aria-label="{i + 1}"></button>' for i in range(len(h["shots"])))
     lang_i = 0 if lang == "de" else 1
     cards = []
     for uid, n_de, n_en, rar, ranged, t_de, t_en, abil in UNITS:
@@ -310,7 +311,7 @@ def home(lang):
 </div>
 </section>
 <section class="facts">{facts}</section>
-<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">‹</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">›</button></div></div><div class="gallery">{shots}</div></section>
+<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">‹</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">›</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
 <section id="features"><h2>{h["features_title"]}</h2><div class="rows">{feats}</div></section>
 <section id="units"><h2>{h["units_title"]}</h2><p class="section-lead">{h["units_lead"]}</p><div class="units">{units}</div></section>
@@ -323,27 +324,62 @@ def home(lang):
     body += """<script>
 document.querySelectorAll('.slider').forEach(function (s) {
   var g = s.querySelector('.gallery');
-  s.querySelectorAll('.arrow').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var step = g.querySelector('img').getBoundingClientRect().width + 14;
-      var dir = +b.dataset.dir;
-      var end = g.scrollWidth - g.clientWidth - 2;
-      if (dir > 0 && g.scrollLeft >= end) g.scrollTo({left: 0, behavior: 'smooth'});
-      else if (dir < 0 && g.scrollLeft <= 2) g.scrollTo({left: end + 2, behavior: 'smooth'});
-      else g.scrollBy({left: dir * step * 2, behavior: 'smooth'});
+  var imgs = g.querySelectorAll('img');
+  var dots = s.querySelectorAll('.dot');
+  function current() {
+    // Bild, dessen linke Kante am nächsten am Anfang des sichtbaren Bereichs liegt.
+    var left = g.getBoundingClientRect().left + parseFloat(getComputedStyle(g).paddingLeft), best = 0, dist = 1e9;
+    imgs.forEach(function (im, i) {
+      var d = Math.abs(im.getBoundingClientRect().left - left);
+      if (d < dist) { dist = d; best = i; }
+    });
+    return best;
+  }
+  // Eigene Animation statt scrollTo({behavior: 'smooth'}): das brechen manche Browser zusammen mit dem Einrasten ab.
+  var anim = null;
+  function go(i) {
+    i = (i + imgs.length) % imgs.length;
+    var from = g.scrollLeft, to = Math.min(imgs[i].offsetLeft - imgs[0].offsetLeft, g.scrollWidth - g.clientWidth), t0 = null;
+    if (anim) cancelAnimationFrame(anim);
+    g.style.scrollSnapType = 'none';
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / 350), e = 1 - Math.pow(1 - k, 3);
+      g.scrollLeft = from + (to - from) * e;
+      if (k < 1) anim = requestAnimationFrame(step);
+      else { anim = null; g.style.scrollSnapType = ''; }
+    }
+    anim = requestAnimationFrame(step);
+  }
+  var tick = null;
+  g.addEventListener('scroll', function () {
+    if (tick) return;
+    tick = requestAnimationFrame(function () {
+      tick = null;
+      var c = current();
+      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
+      dots.forEach(function (d, i) { d.classList.toggle('on', atEnd ? i === dots.length - 1 : i === c); });
     });
   });
-  var down = false, x0 = 0, l0 = 0, moved = false;
+  dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
+  s.querySelectorAll('.arrow').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
+      var dir = +b.dataset.dir;
+      if (dir > 0 && atEnd) go(0); else go(current() + dir);
+    });
+  });
+  // Mit der Maus ziehen (am Handy wischt der Browser selbst).
+  var down = false, x0 = 0, l0 = 0;
   g.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse') return;
-    down = true; moved = false; x0 = e.clientX; l0 = g.scrollLeft; g.classList.add('drag');
+    down = true; x0 = e.clientX; l0 = g.scrollLeft; g.classList.add('drag');
   });
-  window.addEventListener('pointermove', function (e) {
+  window.addEventListener('pointermove', function (e) { if (down) g.scrollLeft = l0 - (e.clientX - x0); });
+  window.addEventListener('pointerup', function () {
     if (!down) return;
-    if (Math.abs(e.clientX - x0) > 4) moved = true;
-    g.scrollLeft = l0 - (e.clientX - x0);
+    down = false; g.classList.remove('drag'); go(current());
   });
-  window.addEventListener('pointerup', function () { if (down) { down = false; g.classList.remove('drag'); } });
   g.addEventListener('dragstart', function (e) { e.preventDefault(); });
 });
 document.querySelectorAll('.unit').forEach(function (u) {
