@@ -41,8 +41,8 @@ def page(lang, file, title, body, description=""):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Die Seite ist selbst dunkel gestaltet: Browser sollen sie im Darkmode nicht automatisch umfärben (Samsung Internet, Chrome). -->
-<meta name="color-scheme" content="dark">
-<meta name="supported-color-schemes" content="dark">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="light only">
 <title>{title}</title>
 <meta name="description" content="{description}">
 <link rel="icon" href="{p}favicon.png">
