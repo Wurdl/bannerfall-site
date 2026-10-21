@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Erzeugt die statischen Seiten von bannerfall-tinybattle.com (Englisch im Wurzelordner, Deutsch unter /de/).
 Aufruf: python3 build.py  – danach committen und pushen (GitHub Pages)."""
+import hashlib
 import os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTACT = "ehmannjakob@gmail.com"
+# Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
+CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 20, 2026", "de": "20. Oktober 2026"}
 
 T = {
@@ -44,7 +47,7 @@ def page(lang, file, title, body, description=""):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{p}style.css">
+<link rel="stylesheet" href="{p}style.css?v={CSS_VERSION}">
 </head>
 <body>
 <div class="wrap">
