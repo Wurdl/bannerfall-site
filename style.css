@@ -438,25 +438,18 @@ footer a { color: var(--muted); }
   color: transparent;
 }
 
-/* Beta-Knöpfe direkt unter der Hero-Sektion */
+/* Beta: je Handy eine Karte mit nummerierten Schritten */
 .beta { text-align: center; padding-top: 8px; }
 .beta .section-lead { margin-left: auto; margin-right: auto; max-width: 36em; }
-.beta-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: center; gap: 18px; margin-top: 22px; }
-.btn.store { position: relative; z-index: 0; overflow: hidden; padding: 16px 20px; text-align: center; }
-.btn.store .ink { display: block; }
-.btn.store small { display: block; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-.btn.store b { display: block; font-size: 22px; line-height: 1.15; }
-.btn.store.mine { box-shadow: 0 5px 0 var(--ink), 0 0 0 5px rgba(255, 255, 255, 0.55); }
-.beta-note { color: var(--muted); font-size: 15px; max-width: 40em; margin: 18px auto 0; }
-@media (max-width: 640px) {
-  .beta-btns { grid-template-columns: 1fr; }
-}
-
-/* Android-Beta: drei nummerierte Schritte (Gruppe, Tester werden, Play Store) */
-.android { max-width: 560px; margin: 30px auto 0; padding: 22px 20px 8px; border-radius: 22px; background: rgba(255, 255, 255, 0.08); text-align: left; }
-.android h3 { text-align: center; margin: 0 0 16px; }
+.bcards { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); justify-content: center; align-items: stretch; gap: 24px; margin-top: 26px; text-align: left; }
+.bcard { padding: 22px 22px 6px; border-radius: 22px; background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.12); }
+.bcard.mine { border-color: rgba(255, 255, 255, 0.55); }
+.bcard h3 { text-align: center; margin: 0 0 18px; font-size: 24px; }
 .asteps { list-style: none; margin: 0; padding: 0; }
-.asteps li { margin-bottom: 18px; }
-.asteps .btn { display: block; text-align: left; padding: 14px 18px; font-size: 19px; }
-.asteps .btn b { display: inline-block; min-width: 1.6em; }
-.asteps p { margin: 8px 4px 0; color: var(--muted); font-size: 15px; }
+.asteps li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; margin-bottom: 18px; }
+.snum { width: 40px; height: 40px; margin-top: 6px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 19px; color: #fff; background: rgba(255, 255, 255, 0.16); border: 2px solid rgba(255, 255, 255, 0.5); }
+.asteps .btn { display: block; text-align: center; padding: 13px 16px; font-size: 18px; }
+.asteps p { margin: 8px 2px 0; color: var(--muted); font-size: 14.5px; line-height: 1.45; }
+@media (max-width: 760px) {
+  .bcards { grid-template-columns: minmax(0, 460px); }
+}

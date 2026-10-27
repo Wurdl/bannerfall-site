@@ -8,6 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTACT = "ehmannjakob@gmail.com"
 # Beta-Links: öffentlicher TestFlight-Link (iOS) und Beitrittsseite der Google Group (Android). Leer = Anmeldung per E-Mail.
 TESTFLIGHT_URL = "https://testflight.apple.com/join/FJttqMWU"
+TESTFLIGHT_APP_URL = "https://apps.apple.com/app/testflight/id899247664"
 ANDROID_BETA_URL = "https://groups.google.com/g/bannerfall-tester"
 # Android-Test: nach dem Gruppenbeitritt „Tester werden“ (eigene Play-Seite) und dann im Play Store installieren.
 ANDROID_OPTIN_URL = "https://play.google.com/apps/testing/de.jakobehmann.bannerfall"
@@ -198,14 +199,16 @@ HOME = {
         "cta": [("#features", "Discover the game", "ghost")],
         "beta_title": "Play the beta now",
         "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
-        "beta_ios": ("iPhone", "Test via TestFlight"),
-        "beta_android": ("Android", "Test on Google Play"),
-        "beta_note": "iPhone: install Apple’s free TestFlight app first, then tap the iPhone button. Android: three short steps – see below.",
-        "android_title": "Android in 3 steps",
-        "android_steps": [
-            ("Join the tester group", "group", "Sign in with the Google account you use on Google Play and tap “Join group”. Then come back to this page."),
-            ("Become a tester", "optin", "Tap “Become a tester” – the group page itself has no such button."),
-            ("Install from Google Play", "store", "Install the game. Please stay in the test for at least 14 days."),
+        "beta_cards": [
+            ("ios", "iPhone", [
+                ("Install TestFlight", "testflight_app", "Apple’s free app for beta tests."),
+                ("Open the beta", "testflight", "Opens Bannerfall in TestFlight – tap “Install” there."),
+            ]),
+            ("android", "Android", [
+                ("Join the tester group", "group", "Sign in with the Google account you use on Google Play, tap “Join group”, then come back here."),
+                ("Become a tester", "optin", "Tap “Become a tester” on the page that opens."),
+                ("Install from Google Play", "store", "Please stay in the test for at least 14 days."),
+            ]),
         ],
         "facts": [("22", "units to collect"), ("6", "worlds to conquer"), ("3", "spells to master"), ("1", "hero to lead them")],
         "how_title": "How a battle works",
@@ -256,14 +259,16 @@ HOME = {
         "cta": [("#features", "Spiel entdecken", "ghost")],
         "beta_title": "Jetzt die Beta spielen",
         "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
-        "beta_ios": ("iPhone", "Über TestFlight testen"),
-        "beta_android": ("Android", "Bei Google Play testen"),
-        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren, dann den iPhone-Knopf tippen. Android: drei kurze Schritte – siehe unten.",
-        "android_title": "Android in 3 Schritten",
-        "android_steps": [
-            ("Der Testergruppe beitreten", "group", "Mit dem Google-Konto anmelden, das du auch im Play Store nutzt, und „Gruppe beitreten“ tippen. Danach zurück auf diese Seite kommen."),
-            ("Tester werden", "optin", "„Tester werden“ tippen – auf der Gruppenseite selbst gibt es diesen Knopf nicht."),
-            ("Bei Google Play installieren", "store", "Das Spiel installieren. Bitte mindestens 14 Tage im Test bleiben."),
+        "beta_cards": [
+            ("ios", "iPhone", [
+                ("TestFlight installieren", "testflight_app", "Die kostenlose App von Apple für Betatests."),
+                ("Beta öffnen", "testflight", "Öffnet Bannerfall in TestFlight – dort „Installieren“ tippen."),
+            ]),
+            ("android", "Android", [
+                ("Der Testergruppe beitreten", "group", "Mit dem Google-Konto des Play Stores anmelden, „Gruppe beitreten“ tippen und hierher zurückkommen."),
+                ("Tester werden", "optin", "Auf der Seite, die sich öffnet, „Tester werden“ tippen."),
+                ("Bei Google Play installieren", "store", "Bitte mindestens 14 Tage im Test bleiben."),
+            ]),
         ],
         "facts": [("22", "Einheiten zum Sammeln"), ("6", "Welten zum Erobern"), ("3", "Zauber zum Meistern"), ("1", "Held, der sie anführt")],
         "how_title": "So läuft ein Kampf",
@@ -328,16 +333,15 @@ def home(lang):
     h = HOME[lang]
     img = lambda n: f"{p}img/{lang}/{n}.jpg"
     beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
-    ios_url = TESTFLIGHT_URL or beta + "%20iPhone"
-    android_url = "#android"
-    store = lambda cls, url, label: (f'<a class="btn gold store {cls}" href="{url}">'
-                                     + gold_face(p, f'<small>{label[0]}</small><b>{label[1]}</b>') + '</a>')
-    beta_btns = store("ios", ios_url, h["beta_ios"]) + store("android", android_url, h["beta_android"])
-    urls = {"group": ANDROID_BETA_URL, "optin": ANDROID_OPTIN_URL, "store": ANDROID_STORE_URL}
-    android = (f'<div class="android" id="android"><h3>{h["android_title"]}</h3><ol class="asteps">'
-               + "".join(f'<li><a class="btn gold" href="{urls[k]}" target="_blank" rel="noopener">{gold_face(p, f"<b>{i + 1}</b> {t}")}</a><p>{x}</p></li>'
-                         for i, (t, k, x) in enumerate(h["android_steps"]))
-               + '</ol></div>')
+    urls = {"testflight_app": TESTFLIGHT_APP_URL, "testflight": TESTFLIGHT_URL, "group": ANDROID_BETA_URL,
+            "optin": ANDROID_OPTIN_URL, "store": ANDROID_STORE_URL}
+    # Je Handy eine Karte mit nummerierten Schritten; die Nummer steht als Kreis neben dem Knopf (nicht im Goldbild).
+    beta_cards = "".join(
+        f'<div class="bcard {cls}"><h3>{name}</h3><ol class="asteps">'
+        + "".join(f'<li><span class="snum">{i + 1}</span><div><a class="btn gold" href="{urls[k]}" target="_blank" rel="noopener">{gold_face(p, t)}</a><p>{x}</p></div></li>'
+                  for i, (t, k, x) in enumerate(steps))
+        + '</ol></div>'
+        for cls, name, steps in h["beta_cards"])
     ctas = "".join(f'<a class="btn {kind}" href="{href}">{gold_face(p, label) if kind == "gold" else label}</a>' for href, label, kind in h["cta"])
     facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
     how = "".join(f'<li class="step"><span class="num">{gold_face(p, i + 1)}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
@@ -379,7 +383,7 @@ def home(lang):
 <div class="phone"><img src="{img("battle")}" alt="Bannerfall" width="720" height="1280"></div>
 </div>
 </section>
-<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="beta-btns">{beta_btns}</div><p class="beta-note">{h["beta_note"]}</p>{android}</section>
+<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="bcards">{beta_cards}</div></section>
 <section class="facts">{facts}</section>
 <section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">{gold_face(p, "‹")}</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">{gold_face(p, "›")}</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
@@ -395,7 +399,7 @@ def home(lang):
 // Beta-Knopf des eigenen Handys hervorheben und nach vorne holen.
 (function () {
   var ua = navigator.userAgent, mine = /android/i.test(ua) ? 'android' : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && 'ontouchend' in document)) ? 'ios' : '';
-  var b = mine && document.querySelector('.store.' + mine);
+  var b = mine && document.querySelector('.bcard.' + mine);
   if (b) { b.classList.add('mine'); b.parentNode.prepend(b); }
 })();
 document.querySelectorAll('.slider').forEach(function (s) {
