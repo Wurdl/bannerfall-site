@@ -9,6 +9,9 @@ CONTACT = "ehmannjakob@gmail.com"
 # Beta-Links: öffentlicher TestFlight-Link (iOS) und Beitrittsseite der Google Group (Android). Leer = Anmeldung per E-Mail.
 TESTFLIGHT_URL = "https://testflight.apple.com/join/FJttqMWU"
 ANDROID_BETA_URL = "https://groups.google.com/g/bannerfall-tester"
+# Android-Test: nach dem Gruppenbeitritt „Tester werden“ (eigene Play-Seite) und dann im Play Store installieren.
+ANDROID_OPTIN_URL = "https://play.google.com/apps/testing/de.jakobehmann.bannerfall"
+ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehmann.bannerfall"
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
@@ -197,7 +200,13 @@ HOME = {
         "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
         "beta_ios": ("iPhone", "Test via TestFlight"),
         "beta_android": ("Android", "Test on Google Play"),
-        "beta_note": "iPhone: install Apple’s free TestFlight app first. Android: join the tester group, then open <a href='https://play.google.com/apps/testing/de.jakobehmann.bannerfall'>this link</a>, tap “Become a tester” and install from Google Play – please stay in the test for at least 14 days.",
+        "beta_note": "iPhone: install Apple’s free TestFlight app first, then tap the iPhone button. Android: three short steps – see below.",
+        "android_title": "Android in 3 steps",
+        "android_steps": [
+            ("Join the tester group", "group", "Sign in with the Google account you use on Google Play and tap “Join group”. Then come back to this page."),
+            ("Become a tester", "optin", "Tap “Become a tester” – the group page itself has no such button."),
+            ("Install from Google Play", "store", "Install the game. Please stay in the test for at least 14 days."),
+        ],
         "facts": [("22", "units to collect"), ("6", "worlds to conquer"), ("3", "spells to master"), ("1", "hero to lead them")],
         "how_title": "How a battle works",
         "how": [
@@ -249,7 +258,13 @@ HOME = {
         "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
         "beta_ios": ("iPhone", "Über TestFlight testen"),
         "beta_android": ("Android", "Bei Google Play testen"),
-        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren. Android: der Testergruppe beitreten, dann <a href='https://play.google.com/apps/testing/de.jakobehmann.bannerfall'>diesen Link</a> öffnen, „Tester werden“ tippen und über Google Play installieren – bitte mindestens 14 Tage im Test bleiben.",
+        "beta_note": "iPhone: zuerst die kostenlose TestFlight-App von Apple installieren, dann den iPhone-Knopf tippen. Android: drei kurze Schritte – siehe unten.",
+        "android_title": "Android in 3 Schritten",
+        "android_steps": [
+            ("Der Testergruppe beitreten", "group", "Mit dem Google-Konto anmelden, das du auch im Play Store nutzt, und „Gruppe beitreten“ tippen. Danach zurück auf diese Seite kommen."),
+            ("Tester werden", "optin", "„Tester werden“ tippen – auf der Gruppenseite selbst gibt es diesen Knopf nicht."),
+            ("Bei Google Play installieren", "store", "Das Spiel installieren. Bitte mindestens 14 Tage im Test bleiben."),
+        ],
         "facts": [("22", "Einheiten zum Sammeln"), ("6", "Welten zum Erobern"), ("3", "Zauber zum Meistern"), ("1", "Held, der sie anführt")],
         "how_title": "So läuft ein Kampf",
         "how": [
@@ -314,10 +329,15 @@ def home(lang):
     img = lambda n: f"{p}img/{lang}/{n}.jpg"
     beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
     ios_url = TESTFLIGHT_URL or beta + "%20iPhone"
-    android_url = ANDROID_BETA_URL or beta + "%20Android"
+    android_url = "#android"
     store = lambda cls, url, label: (f'<a class="btn gold store {cls}" href="{url}">'
                                      + gold_face(p, f'<small>{label[0]}</small><b>{label[1]}</b>') + '</a>')
     beta_btns = store("ios", ios_url, h["beta_ios"]) + store("android", android_url, h["beta_android"])
+    urls = {"group": ANDROID_BETA_URL, "optin": ANDROID_OPTIN_URL, "store": ANDROID_STORE_URL}
+    android = (f'<div class="android" id="android"><h3>{h["android_title"]}</h3><ol class="asteps">'
+               + "".join(f'<li><a class="btn gold" href="{urls[k]}" target="_blank" rel="noopener">{gold_face(p, f"<b>{i + 1}</b> {t}")}</a><p>{x}</p></li>'
+                         for i, (t, k, x) in enumerate(h["android_steps"]))
+               + '</ol></div>')
     ctas = "".join(f'<a class="btn {kind}" href="{href}">{gold_face(p, label) if kind == "gold" else label}</a>' for href, label, kind in h["cta"])
     facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
     how = "".join(f'<li class="step"><span class="num">{gold_face(p, i + 1)}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
@@ -359,7 +379,7 @@ def home(lang):
 <div class="phone"><img src="{img("battle")}" alt="Bannerfall" width="720" height="1280"></div>
 </div>
 </section>
-<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="beta-btns">{beta_btns}</div><p class="beta-note">{h["beta_note"]}</p></section>
+<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="beta-btns">{beta_btns}</div><p class="beta-note">{h["beta_note"]}</p>{android}</section>
 <section class="facts">{facts}</section>
 <section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">{gold_face(p, "‹")}</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">{gold_face(p, "›")}</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
 <section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
@@ -464,7 +484,7 @@ def support(lang):
 <p><strong>I bought something but didn't receive it.</strong><br>Open Settings in the game and tap “Restore purchases”. If that doesn't help, email us with your player ID and the date of purchase.</p>
 <p><strong>How do I move my progress to a new phone?</strong><br>On the old phone: Settings → “Transfer progress” → create a code. Enter the code on the new phone within 24 hours.</p>
 <p><strong>How do I delete my data?</strong><br>Email us with your player ID and we'll delete your save, leaderboard entry and statistics. See also the <a href="privacy.html">privacy policy</a>.</p>
-<p><strong>Can I join the beta?</strong><br>Yes! iPhone: install TestFlight, then open <a href="{TESTFLIGHT_URL}">the beta link</a>. Android: join the <a href="{ANDROID_BETA_URL}">tester group</a>, open <a href="https://play.google.com/apps/testing/de.jakobehmann.bannerfall">this link</a>, tap “Become a tester” and install from Google Play.</p>
+<p><strong>Can I join the beta?</strong><br>Yes! iPhone: install TestFlight, then open <a href="{TESTFLIGHT_URL}">the beta link</a>. Android: join the <a href="{ANDROID_BETA_URL}">tester group</a>, open <a href="https://play.google.com/apps/testing/de.jakobehmann.bannerfall">this link</a>, tap “Become a tester” and <a href="{ANDROID_STORE_URL}">install from Google Play</a>.</p>
 </main>"""
         title = "Support – Bannerfall"
     else:
@@ -475,7 +495,7 @@ def support(lang):
 <p><strong>Ich habe etwas gekauft, aber nicht erhalten.</strong><br>Öffne im Spiel die Einstellungen und tippe auf „Käufe wiederherstellen“. Hilft das nicht, schreib uns mit Spieler-ID und Kaufdatum.</p>
 <p><strong>Wie nehme ich meinen Spielstand aufs neue Handy mit?</strong><br>Auf dem alten Handy: Einstellungen → „Spielstand übertragen“ → Code erstellen. Den Code innerhalb von 24 Stunden auf dem neuen Handy eingeben.</p>
 <p><strong>Wie lösche ich meine Daten?</strong><br>Schreib uns mit deiner Spieler-ID, dann löschen wir Spielstand, Ranglisten-Eintrag und Statistik. Siehe auch die <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
-<p><strong>Kann ich beim Betatest mitmachen?</strong><br>Ja! iPhone: TestFlight installieren, dann <a href="{TESTFLIGHT_URL}">den Beta-Link</a> öffnen. Android: der <a href="{ANDROID_BETA_URL}">Testergruppe</a> beitreten, <a href="https://play.google.com/apps/testing/de.jakobehmann.bannerfall">diesen Link</a> öffnen, „Tester werden“ tippen und über Google Play installieren.</p>
+<p><strong>Kann ich beim Betatest mitmachen?</strong><br>Ja! iPhone: TestFlight installieren, dann <a href="{TESTFLIGHT_URL}">den Beta-Link</a> öffnen. Android: der <a href="{ANDROID_BETA_URL}">Testergruppe</a> beitreten, <a href="https://play.google.com/apps/testing/de.jakobehmann.bannerfall">diesen Link</a> öffnen, „Tester werden“ tippen und <a href="{ANDROID_STORE_URL}">über Google Play installieren</a>.</p>
 </main>"""
         title = "Support – Bannerfall"
     page(lang, "support.html", title, body)
