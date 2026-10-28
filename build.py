@@ -26,7 +26,7 @@ T = {
     },
     "de": {
         "nav": [("index.html", "Start"), ("support.html", "Support"), ("datenschutz.html", "Datenschutz"), ("impressum.html", "Impressum")],
-        "switch": ("../index.html?en", "English"),
+        "switch": ("../", "English"),
         "prefix": "../",
         "footer": "© 2026 Jakob Ehmann · Bannerfall: Tiny Battle",
     },
@@ -41,7 +41,7 @@ def page(lang, file, title, body, description=""):
         f'<a href="{href}"{current if href == file else ""}>{label}</a>' for href, label in t["nav"]
     )
     alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html"}.get(file, "index.html") if lang == "en" else \
-        "../" + {"index.html": "index.html?en", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html"}.get(file, "index.html")
+        "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html"}.get(file, "index.html")
     html = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -473,9 +473,6 @@ document.querySelectorAll('.unit').forEach(function (u) {
   });
 });
 </script>"""
-    if lang == "en":
-        # Deutschsprachige Browser landen auf der deutschen Startseite (Link „English“ führt mit ?en zurück).
-        body += '<script>if(!location.search.includes("en")&&(navigator.language||"").toLowerCase().startsWith("de"))location.replace("de/");</script>'
     page(lang, "index.html", "Bannerfall: Tiny Battle", body, h["lead"])
 
 
