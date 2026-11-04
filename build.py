@@ -16,6 +16,7 @@ ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehman
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
+UPDATED_IDLE = {"en": "November 4, 2026", "de": "4. November 2026"}
 
 T = {
     "en": {
@@ -40,8 +41,8 @@ def page(lang, file, title, body, description=""):
     nav = "".join(
         f'<a href="{href}"{current if href == file else ""}>{label}</a>' for href, label in t["nav"]
     )
-    alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html"}.get(file, "index.html") if lang == "en" else \
-        "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html"}.get(file, "index.html")
+    alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html", "idle-privacy.html": "idle-datenschutz.html"}.get(file, "index.html") if lang == "en" else \
+        "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html", "idle-datenschutz.html": "idle-privacy.html"}.get(file, "index.html")
     html = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -621,9 +622,73 @@ def privacy(lang):
         page(lang, "datenschutz.html", "Datenschutzerklärung – Bannerfall", body)
 
 
+def privacy_idle(lang):
+    """Datenschutzerklärung für das zweite Spiel „Bannerfall Idle“ (eigenes Firebase-Projekt bannerfall-idle, Frankfurt).
+    Stand 4.11.2026: nur Cloud-Speicher, keine Werbung, keine Käufe, keine Statistik. Kommt das dazu, hier ergänzen."""
+    if lang == "en":
+        rows = [
+            ("Random anonymous player ID and sign-in token (created by Firebase Authentication)", "Assigning your save game, protection against access by others", "Art. 6(1)(b) GDPR (providing the game)"),
+            ("Save game (skills, items, gold, progress, settings) and one backup copy per day (the last 10)", "Cloud backup, restoring after reinstalling, playing on several devices", "Art. 6(1)(b) GDPR"),
+            ("Link code from “Link device” (valid for 15 minutes)", "Connecting another device to your save game", "Art. 6(1)(b) GDPR"),
+        ]
+        table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
+        body = f"""<main class="doc">
+<h1>Privacy Policy – Bannerfall Idle</h1>
+<p class="note">For the game “Bannerfall Idle” (iOS and Android). Last updated: {UPDATED_IDLE['en']}. For “Bannerfall: Tiny Battle” see <a href="privacy.html">this privacy policy</a>.</p>
+<h2>1. Controller</h2>
+<p>{ADDRESS}<br>Email: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+<h2>2. Data processed by the game</h2>
+<div class="table-scroll"><table><tr><th>Data</th><th>Purpose</th><th>Legal basis</th></tr>{table}</table></div>
+<p>The game does <strong>not</strong> collect your real name, email address, phone number, contacts or location. It contains <strong>no advertising, no in-app purchases and no analytics or tracking</strong>, and it does not use the advertising identifier (IDFA / Android advertising ID). On iOS the player ID and sign-in token are additionally stored in your device's keychain, so your save game can be restored after reinstalling the app; this data stays on your device.</p>
+<h2>3. Google Firebase</h2>
+<p>Save games and link codes are stored with Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) in the data center <strong>Frankfurt am Main (europe-west3)</strong>. Google acts as processor. A transfer to third countries cannot be completely ruled out for Google services; Google relies on the EU-US Data Privacy Framework and standard contractual clauses.</p>
+<h2>4. Retention</h2>
+<p>Your save game is stored as long as the player ID is used and deleted no later than 24 months after the last use. Of the daily backup copies only the last 10 are kept. Link codes expire after 15 minutes and are deleted when used.</p>
+<h2>5. Your rights</h2>
+<p>You have the right to access, rectification, erasure, restriction of processing, data portability and objection (Art. 15–21 GDPR). To delete your data, send an email to <a href="mailto:{CONTACT}">{CONTACT}</a>. So we can find your save game, please include a code from Settings → “Link device” (you don't need to redeem it). You also have the right to lodge a complaint with a supervisory authority, in Austria the Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
+<h2>6. Children</h2>
+<p>The game is not directed at children under 13.</p>
+<h2>7. This website</h2>
+<p>This website is hosted by GitHub Pages (GitHub Inc., USA). When you visit it, GitHub processes technical access data (e.g. IP address) to deliver the page and for security. Fonts are loaded from Google Fonts (Google Ireland Limited), which also receives your IP address. The website does not use cookies or tracking.</p>
+<h2>8. Changes</h2>
+<p>We will update this privacy policy when the game or the law changes, in particular before features such as optional ads or purchases are added. The current version is always available on this page.</p>
+</main>"""
+        page(lang, "idle-privacy.html", "Privacy Policy – Bannerfall Idle", body)
+    else:
+        rows = [
+            ("Zufällige, anonyme Spieler-Kennung und Anmelde-Token (von Firebase Authentication erzeugt)", "Zuordnung des Spielstands, Schutz vor fremdem Zugriff", "Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Spiels)"),
+            ("Spielstand (Fertigkeiten, Gegenstände, Gold, Fortschritt, Einstellungen) und eine Sicherungskopie pro Tag (die letzten 10)", "Sicherung in der Cloud, Wiederherstellen nach dem Neuinstallieren, Spielen auf mehreren Geräten", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Code aus „Gerät verbinden“ (15 Minuten gültig)", "Verbinden eines weiteren Geräts mit deinem Spielstand", "Art. 6 Abs. 1 lit. b DSGVO"),
+        ]
+        table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
+        body = f"""<main class="doc">
+<h1>Datenschutzerklärung – Bannerfall Idle</h1>
+<p class="note">Für das Spiel „Bannerfall Idle“ (iOS und Android). Stand: {UPDATED_IDLE['de']}. Für „Bannerfall: Tiny Battle“ gilt <a href="datenschutz.html">diese Datenschutzerklärung</a>.</p>
+<h2>1. Verantwortlicher</h2>
+<p>{ADDRESS.replace(" / Austria", "")}<br>E-Mail: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+<h2>2. Welche Daten das Spiel verarbeitet</h2>
+<div class="table-scroll"><table><tr><th>Daten</th><th>Zweck</th><th>Rechtsgrundlage</th></tr>{table}</table></div>
+<p>Das Spiel erhebt <strong>keine</strong> echten Namen, E-Mail-Adressen, Telefonnummern, Kontakte oder Standortdaten. Es enthält <strong>keine Werbung, keine Käufe im Spiel und keine Statistik oder Nachverfolgung</strong> und verwendet keine Werbe-ID (IDFA bzw. Android-Werbe-ID). Unter iOS liegen Spieler-Kennung und Anmelde-Token zusätzlich im Schlüsselbund deines Geräts, damit der Spielstand nach dem Neuinstallieren zurückkommt; diese Daten bleiben auf deinem Gerät.</p>
+<h2>3. Google Firebase</h2>
+<p>Spielstände und Verbindungscodes werden bei Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im Rechenzentrum <strong>Frankfurt am Main (europe-west3)</strong> gespeichert. Google ist Auftragsverarbeiter. Eine Übermittlung in Drittländer kann bei Google-Diensten nicht vollständig ausgeschlossen werden; Google stützt sich dafür auf das EU-US Data Privacy Framework und Standardvertragsklauseln.</p>
+<h2>4. Speicherdauer</h2>
+<p>Der Spielstand wird gespeichert, solange die Spieler-Kennung genutzt wird, und spätestens 24 Monate nach der letzten Nutzung gelöscht. Von den täglichen Sicherungskopien bleiben nur die letzten 10. Verbindungscodes verfallen nach 15 Minuten und werden beim Einlösen gelöscht.</p>
+<h2>5. Deine Rechte</h2>
+<p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO). Für eine Löschung genügt eine E-Mail an <a href="mailto:{CONTACT}">{CONTACT}</a>. Damit wir deinen Spielstand finden, schick bitte einen Code aus Einstellungen → „Gerät verbinden“ mit (du musst ihn nicht einlösen). Außerdem kannst du dich bei einer Aufsichtsbehörde beschweren, in Österreich bei der Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
+<h2>6. Kinder</h2>
+<p>Das Spiel richtet sich nicht an Kinder unter 13 Jahren.</p>
+<h2>7. Diese Website</h2>
+<p>Diese Website wird von GitHub Pages (GitHub Inc., USA) bereitgestellt. Beim Aufruf verarbeitet GitHub technische Zugriffsdaten (z. B. IP-Adresse), um die Seite auszuliefern und zur Sicherheit. Schriftarten werden von Google Fonts (Google Ireland Limited) geladen; dabei wird ebenfalls deine IP-Adresse übertragen. Die Website verwendet keine Cookies und kein Tracking.</p>
+<h2>8. Änderungen</h2>
+<p>Wir passen diese Datenschutzerklärung an, wenn sich das Spiel oder die Rechtslage ändert, insbesondere bevor Funktionen wie freiwillige Werbung oder Käufe dazukommen. Die aktuelle Fassung findest du immer auf dieser Seite.</p>
+</main>"""
+        page(lang, "idle-datenschutz.html", "Datenschutzerklärung – Bannerfall Idle", body)
+
+
 for lang in ("en", "de"):
     home(lang)
     support(lang)
     imprint(lang)
     privacy(lang)
+    privacy_idle(lang)
 print("ok")
