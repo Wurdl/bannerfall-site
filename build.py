@@ -20,13 +20,13 @@ UPDATED_IDLE = {"en": "November 4, 2026", "de": "4. November 2026"}
 
 T = {
     "en": {
-        "nav": [("index.html", "Home"), ("support.html", "Support"), ("privacy.html", "Privacy"), ("imprint.html", "Imprint")],
+        "nav": [("index.html", "Home"), ("idle/", "Bannerfall Idle"), ("support.html", "Support"), ("privacy.html", "Privacy"), ("imprint.html", "Imprint")],
         "switch": ("de/", "Deutsch"),
         "prefix": "",
         "footer": "© 2026 Jakob Ehmann · Bannerfall: Tiny Battle",
     },
     "de": {
-        "nav": [("index.html", "Start"), ("support.html", "Support"), ("datenschutz.html", "Datenschutz"), ("impressum.html", "Impressum")],
+        "nav": [("index.html", "Start"), ("idle/", "Bannerfall Idle"), ("support.html", "Support"), ("datenschutz.html", "Datenschutz"), ("impressum.html", "Impressum")],
         "switch": ("../", "English"),
         "prefix": "../",
         "footer": "© 2026 Jakob Ehmann · Bannerfall: Tiny Battle",
@@ -34,15 +34,28 @@ T = {
 }
 
 
-def page(lang, file, title, body, description=""):
+def page(lang, file, title, body, description="", idle=False):
+    """idle=True: Seite von Bannerfall Idle im Unterordner idle/ (eigenes Symbol, eigener Kopf, Links eine Ebene höher)."""
     t = T[lang]
     p = t["prefix"]
     current = ' aria-current="page"'
+    nav_items = t["nav"]
+    brand = f'<a class="brand" href="index.html"><img src="{p}img/icon.png" alt="">Bannerfall</a>'
+    icons = (f"{p}favicon.png", f"{p}apple-touch-icon.png")
+    footer = t["footer"]
+    if idle:
+        p += "../"
+        nav_items = [(h if h.startswith("#") else "../" + h, l) for h, l in IDLE_NAV[lang]]
+        brand = f'<a class="brand" href="./"><img src="{p}img/idle/icon.png" alt="">Bannerfall Idle</a>'
+        icons = (f"{p}img/idle/favicon.png", f"{p}img/idle/apple-touch-icon.png")
+        footer = "© 2026 Jakob Ehmann · Bannerfall Idle"
     nav = "".join(
-        f'<a href="{href}"{current if href == file else ""}>{label}</a>' for href, label in t["nav"]
+        f'<a href="{href}"{current if href == file else ""}>{label}</a>' for href, label in nav_items
     )
     alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html", "idle-privacy.html": "idle-datenschutz.html"}.get(file, "index.html") if lang == "en" else \
         "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html", "idle-datenschutz.html": "idle-privacy.html"}.get(file, "index.html")
+    if idle:
+        alt = "../de/idle/" if lang == "en" else "../../idle/"
     html = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -53,8 +66,8 @@ def page(lang, file, title, body, description=""):
 <meta name="supported-color-schemes" content="light only">
 <title>{title}</title>
 <meta name="description" content="{description}">
-<link rel="icon" href="{p}favicon.png">
-<link rel="apple-touch-icon" href="{p}apple-touch-icon.png">
+<link rel="icon" href="{icons[0]}">
+<link rel="apple-touch-icon" href="{icons[1]}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@400;600;800&display=swap" rel="stylesheet">
@@ -63,16 +76,17 @@ def page(lang, file, title, body, description=""):
 <body>
 <div class="wrap">
 <header class="top">
-<a class="brand" href="index.html"><img src="{p}img/icon.png" alt="">Bannerfall</a>
+{brand}
 <nav>{nav}<a href="{alt}" lang="{"de" if lang == "en" else "en"}">{t["switch"][1]}</a></nav>
 </header>
 {body}
 </div>
-<footer><div class="wrap"><span>{t["footer"]}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in t["nav"][1:])}</span></div></footer>
+<footer><div class="wrap"><span>{footer}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in nav_items[1:])}</span></div></footer>
 </body>
 </html>
 """
-    out = os.path.join(ROOT, "" if lang == "en" else "de", file)
+    out = os.path.join(ROOT, "" if lang == "en" else "de", "idle" if idle else "", file)
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as f:
         f.write(html)
 
@@ -335,6 +349,76 @@ def gold_face(p, text):
     return f'<img class="face" src="{p}img/ui/gold.png" alt="" aria-hidden="true"><span class="ink">{text}</span>'
 
 
+# Beta-Karte des eigenen Handys nach vorne holen und Bilder-Slider (Startseite und Idle-Seite).
+PAGE_JS = """// Beta-Knopf des eigenen Handys hervorheben und nach vorne holen.
+(function () {
+  var ua = navigator.userAgent, mine = /android/i.test(ua) ? 'android' : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && 'ontouchend' in document)) ? 'ios' : '';
+  var b = mine && document.querySelector('.bcard.' + mine);
+  if (b) { b.classList.add('mine'); b.parentNode.prepend(b); }
+})();
+document.querySelectorAll('.slider').forEach(function (s) {
+  var g = s.querySelector('.gallery');
+  var imgs = g.querySelectorAll('img');
+  var dots = s.querySelectorAll('.dot');
+  function current() {
+    // Bild, dessen linke Kante am nächsten am Anfang des sichtbaren Bereichs liegt.
+    var left = g.getBoundingClientRect().left + parseFloat(getComputedStyle(g).paddingLeft), best = 0, dist = 1e9;
+    imgs.forEach(function (im, i) {
+      var d = Math.abs(im.getBoundingClientRect().left - left);
+      if (d < dist) { dist = d; best = i; }
+    });
+    return best;
+  }
+  // Eigene Animation statt scrollTo({behavior: 'smooth'}): das brechen manche Browser zusammen mit dem Einrasten ab.
+  var anim = null;
+  function go(i) {
+    i = (i + imgs.length) % imgs.length;
+    var from = g.scrollLeft, to = Math.min(imgs[i].offsetLeft - imgs[0].offsetLeft, g.scrollWidth - g.clientWidth), t0 = null;
+    if (anim) cancelAnimationFrame(anim);
+    g.style.scrollSnapType = 'none';
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / 350), e = 1 - Math.pow(1 - k, 3);
+      g.scrollLeft = from + (to - from) * e;
+      if (k < 1) anim = requestAnimationFrame(step);
+      else { anim = null; g.style.scrollSnapType = ''; }
+    }
+    anim = requestAnimationFrame(step);
+  }
+  var tick = null;
+  g.addEventListener('scroll', function () {
+    if (tick) return;
+    tick = requestAnimationFrame(function () {
+      tick = null;
+      var c = current();
+      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
+      dots.forEach(function (d, i) { d.classList.toggle('on', atEnd ? i === dots.length - 1 : i === c); });
+    });
+  });
+  dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
+  s.querySelectorAll('.arrow').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
+      var dir = +b.dataset.dir;
+      if (dir > 0 && atEnd) go(0); else go(current() + dir);
+    });
+  });
+  // Mit der Maus ziehen (am Handy wischt der Browser selbst).
+  var down = false, x0 = 0, l0 = 0;
+  g.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    down = true; x0 = e.clientX; l0 = g.scrollLeft; g.classList.add('drag');
+  });
+  window.addEventListener('pointermove', function (e) { if (down) g.scrollLeft = l0 - (e.clientX - x0); });
+  window.addEventListener('pointerup', function () {
+    if (!down) return;
+    down = false; g.classList.remove('drag'); go(current());
+  });
+  g.addEventListener('dragstart', function (e) { e.preventDefault(); });
+});
+"""
+
+
 def home(lang):
     p = T[lang]["prefix"]
     h = HOME[lang]
@@ -402,74 +486,7 @@ def home(lang):
 </main>"""
     # Slider: Pfeile blättern eine Bildbreite weiter, mit der Maus lässt er sich ziehen.
     # Einheiten: Klick auf eine Stufe tauscht das Bild.
-    body += """<script>
-// Beta-Knopf des eigenen Handys hervorheben und nach vorne holen.
-(function () {
-  var ua = navigator.userAgent, mine = /android/i.test(ua) ? 'android' : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && 'ontouchend' in document)) ? 'ios' : '';
-  var b = mine && document.querySelector('.bcard.' + mine);
-  if (b) { b.classList.add('mine'); b.parentNode.prepend(b); }
-})();
-document.querySelectorAll('.slider').forEach(function (s) {
-  var g = s.querySelector('.gallery');
-  var imgs = g.querySelectorAll('img');
-  var dots = s.querySelectorAll('.dot');
-  function current() {
-    // Bild, dessen linke Kante am nächsten am Anfang des sichtbaren Bereichs liegt.
-    var left = g.getBoundingClientRect().left + parseFloat(getComputedStyle(g).paddingLeft), best = 0, dist = 1e9;
-    imgs.forEach(function (im, i) {
-      var d = Math.abs(im.getBoundingClientRect().left - left);
-      if (d < dist) { dist = d; best = i; }
-    });
-    return best;
-  }
-  // Eigene Animation statt scrollTo({behavior: 'smooth'}): das brechen manche Browser zusammen mit dem Einrasten ab.
-  var anim = null;
-  function go(i) {
-    i = (i + imgs.length) % imgs.length;
-    var from = g.scrollLeft, to = Math.min(imgs[i].offsetLeft - imgs[0].offsetLeft, g.scrollWidth - g.clientWidth), t0 = null;
-    if (anim) cancelAnimationFrame(anim);
-    g.style.scrollSnapType = 'none';
-    function step(t) {
-      if (t0 === null) t0 = t;
-      var k = Math.min(1, (t - t0) / 350), e = 1 - Math.pow(1 - k, 3);
-      g.scrollLeft = from + (to - from) * e;
-      if (k < 1) anim = requestAnimationFrame(step);
-      else { anim = null; g.style.scrollSnapType = ''; }
-    }
-    anim = requestAnimationFrame(step);
-  }
-  var tick = null;
-  g.addEventListener('scroll', function () {
-    if (tick) return;
-    tick = requestAnimationFrame(function () {
-      tick = null;
-      var c = current();
-      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
-      dots.forEach(function (d, i) { d.classList.toggle('on', atEnd ? i === dots.length - 1 : i === c); });
-    });
-  });
-  dots.forEach(function (d, i) { d.addEventListener('click', function () { go(i); }); });
-  s.querySelectorAll('.arrow').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var atEnd = g.scrollLeft >= g.scrollWidth - g.clientWidth - 4;
-      var dir = +b.dataset.dir;
-      if (dir > 0 && atEnd) go(0); else go(current() + dir);
-    });
-  });
-  // Mit der Maus ziehen (am Handy wischt der Browser selbst).
-  var down = false, x0 = 0, l0 = 0;
-  g.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse') return;
-    down = true; x0 = e.clientX; l0 = g.scrollLeft; g.classList.add('drag');
-  });
-  window.addEventListener('pointermove', function (e) { if (down) g.scrollLeft = l0 - (e.clientX - x0); });
-  window.addEventListener('pointerup', function () {
-    if (!down) return;
-    down = false; g.classList.remove('drag'); go(current());
-  });
-  g.addEventListener('dragstart', function (e) { e.preventDefault(); });
-});
-document.querySelectorAll('.unit').forEach(function (u) {
+    body += "<script>\n" + PAGE_JS + """document.querySelectorAll('.unit').forEach(function (u) {
   var img = u.querySelector('.pic img');
   u.querySelectorAll('.form').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -685,7 +702,223 @@ def privacy_idle(lang):
         page(lang, "idle-datenschutz.html", "Datenschutzerklärung – Bannerfall Idle", body)
 
 
+# --- Bannerfall Idle: Startseite unter /idle/ (Englisch) und /de/idle/ (Deutsch) ---
+# Beta-Links: leer bzw. False = „folgt in Kürze“ mit Knopf „Bescheid geben“ (E-Mail). Eintragen, sobald es sie gibt:
+# öffentlicher Link der externen TestFlight-Gruppe; True, sobald der geschlossene Test bei Google Play läuft.
+IDLE_TESTFLIGHT_URL = ""
+IDLE_ANDROID_OPEN = False
+IDLE_ANDROID_OPTIN_URL = "https://play.google.com/apps/testing/de.jakobehmann.bannerfallidle"
+IDLE_ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehmann.bannerfallidle"
+# Navigation der Idle-Seiten (Pfade wie von der Wurzel bzw. /de/ aus; page() setzt „../“ davor).
+IDLE_NAV = {
+    "en": [("idle/", "Home"), ("index.html", "Bannerfall: Tiny Battle"), ("idle-privacy.html", "Privacy"), ("imprint.html", "Imprint")],
+    "de": [("idle/", "Start"), ("index.html", "Bannerfall: Tiny Battle"), ("idle-datenschutz.html", "Datenschutz"), ("impressum.html", "Impressum")],
+}
+# Bilder: img/idle/<lang>/<name>.jpg, aus den Spielbildern des Idle-Projekts
+# (STORE=1 SHOT_WIDTH=720 SHOT_DIR=… WINDOW=1 sh tools/tests/run.sh shots, Englisch mit BI_LANG=en).
+IDLE = {
+    "en": {
+        "tag_open": "Beta now open · iPhone & Android",
+        "tag_soon": "Beta starting soon · iPhone & Android",
+        "sub": "Idle RPG",
+        "lead": "A relaxed RPG that keeps playing on its own. Your hero chops trees, mines ore, forges swords and fights monsters – even while your phone is in your pocket.",
+        "cta": "Discover the game",
+        "beta_title": "Join the beta",
+        "beta_lead": "Bannerfall Idle is about to start testing on iPhone and Android. Pick your phone – your feedback shapes the game.",
+        "soon": "Coming soon",
+        "notify": "Notify me",
+        "notify_ios": "The public TestFlight link is on its way. Send a short email and you'll get it first.",
+        "ios_steps": [
+            ("Install TestFlight", "testflight_app", "Apple’s free app for beta tests."),
+            ("Open the beta", "testflight", "Opens Bannerfall Idle in TestFlight – tap “Install” there."),
+        ],
+        "android_steps": [
+            ("Join the tester group", "group", "Sign in with the Google account you use on Google Play and tap “Join group”. Already in the Bannerfall group? Then you're set."),
+            ("Become a tester", "optin", "Tap “Become a tester” on the page that opens."),
+            ("Install from Google Play", "store", "Please stay in the test for at least 14 days."),
+        ],
+        "facts": [("23", "skills to level 99"), ("41", "monsters and bosses"), ("283", "items to collect"), ("26", "rare pets")],
+        "how_title": "How it works",
+        "how": [
+            ("Pick an activity", "Woodcutting, fishing, smithing or a fight – one tap and your hero gets to work."),
+            ("Put your phone away", "Your hero keeps going while the game is closed: up to 4 hours, 8 with Supporter."),
+            ("Come back and grow", "Collect your loot, level up, forge better gear and unlock new areas."),
+        ],
+        "features_title": "What awaits you",
+        "features": [
+            ("offline", "Keeps playing while you're away", "Choose an activity and close the game. When you come back, you see exactly what your hero got done: logs, experience, new levels and sometimes a rare pet."),
+            ("drawer2", "23 skills to level 99", "Woodcutting, Mining, Fishing, Hunting, Thieving and Agility bring in resources. Smithing, Cooking, Fletching, Runecarving, Crafting and Herbalism turn them into gear, food, arrows, runes and potions. Every target has its own mastery that makes it faster over time."),
+            ("smithing", "Forge your own gear", "Ore becomes bars, bars become swords, helmets and armor. Every metal is stronger than the last, and growing mastery saves you materials."),
+            ("slayer_combat", "Melee, ranged and magic", "Three combat styles that beat each other. Fight 41 monsters across twelve areas, charge up special attacks and take on bounties. Pack food and potions and your hero fights on even offline."),
+            ("dungeon", "Dungeons and bosses", "Five dungeons with a boss and a chest at the end, plus mighty bosses that drop rare boss pets of their own."),
+            ("farming3", "Crops and animals", "Grow herbs and vegetables on the side, keep bees and silkworms, and harvest whenever you drop by."),
+            ("pet", "Find rare pets", "26 pets, each with its own bonus. They turn up rarely while you chop, fish or fight – even while you're offline."),
+            ("construction2", "Build your stronghold", "Upgrade the sawmill, the smelter, the storehouse and more. Every building of your stronghold grants lasting bonuses."),
+            ("quests", "Help the village", "44 adventures from the people of the village, orders to deliver, achievements and a collection book with 283 items."),
+            ("guild_members", "Guilds", "Found a guild or join one. Together you reach the weekly goal, beat the guild boss and storm the raid. Leaders and officers invite players and manage the members."),
+            ("market", "Trade in the Market Hall", "Offer your goods to other players and set your own price. Sold items turn into gold, waiting for you to collect."),
+            ("weekly", "Weekly competition and world boss", "A new goal for everyone each week, with rewards and a leaderboard. On weekends all players fight the world boss together, and you can cheer on your friends for bonus experience."),
+        ],
+        "fair_title": "Fair to play",
+        "fair": [
+            ("Free to play", "Every skill, area and boss can be reached without paying."),
+            ("Ads only if you want", "Videos only when you start them, for example for an experience boost."),
+            ("No energy system", "Play as long as you like – or not at all for a while."),
+            ("Your progress is safe", "Cloud backup and a code to move your progress to a new phone."),
+        ],
+        "shots_title": "Screenshots",
+        "prev": "Previous", "next": "Next",
+        "faq_title": "Questions",
+        "faq": [
+            ("What is an idle game?", "A game that keeps going without you. You decide what your hero does, and they keep doing it while the app is closed. Check in for a minute or play for an hour – both work."),
+            ("When does Bannerfall Idle come out?", "We're about to start the beta on iPhone (TestFlight) and Android (Google Play). The release follows once the feedback is in."),
+            ("Is it related to Bannerfall: Tiny Battle?", "It comes from the same developer and shares the look, but it's a game of its own with its own progress. You don't need Bannerfall to play it."),
+            ("Does the game cost anything?", "No. Bannerfall Idle is free. The optional one-time “Supporter” purchase extends offline time to 8 hours and adds a few comforts, but everything can be reached by playing."),
+            ("Which languages are supported?", "English and German. The game follows your device language and can be switched in the settings."),
+            ("Who makes Bannerfall Idle?", "Bannerfall Idle is an indie game by Jakob Ehmann from Austria."),
+        ],
+        "end_title": "Want to play before everyone else?",
+        "end_text": "Join the beta on iPhone or Android. Your feedback shapes the game.",
+        "end_cta": "Join the beta",
+        "other": "Also by us: <a href=\"../index.html\">Bannerfall: Tiny Battle</a>, a lane battle game with 22 units.",
+        "title": "Bannerfall Idle – Idle RPG for iPhone & Android",
+    },
+    "de": {
+        "tag_open": "Betatest läuft · iPhone & Android",
+        "tag_soon": "Betatest startet bald · iPhone & Android",
+        "sub": "Idle-Rollenspiel",
+        "lead": "Ein entspanntes Rollenspiel, das sich von selbst weiterspielt. Dein Held fällt Bäume, schürft Erz, schmiedet Schwerter und kämpft gegen Monster – auch wenn das Handy in der Tasche ist.",
+        "cta": "Spiel entdecken",
+        "beta_title": "Beim Betatest mitmachen",
+        "beta_lead": "Bannerfall Idle geht bald auf dem iPhone und unter Android in den Test. Wähl dein Handy – dein Feedback formt das Spiel.",
+        "soon": "Folgt in Kürze",
+        "notify": "Bescheid geben",
+        "notify_ios": "Der öffentliche TestFlight-Link ist unterwegs. Schreib eine kurze E-Mail, dann bekommst du ihn als Erstes.",
+        "ios_steps": [
+            ("TestFlight installieren", "testflight_app", "Die kostenlose App von Apple für Betatests."),
+            ("Beta öffnen", "testflight", "Öffnet Bannerfall Idle in TestFlight – dort „Installieren“ tippen."),
+        ],
+        "android_steps": [
+            ("Der Testergruppe beitreten", "group", "Mit dem Google-Konto des Play Stores anmelden und „Gruppe beitreten“ tippen. Schon in der Bannerfall-Gruppe? Dann passt es schon."),
+            ("Tester werden", "optin", "Auf der Seite, die sich öffnet, „Tester werden“ tippen."),
+            ("Bei Google Play installieren", "store", "Bitte mindestens 14 Tage im Test bleiben."),
+        ],
+        "facts": [("23", "Fertigkeiten bis Stufe 99"), ("41", "Gegner und Bosse"), ("283", "Gegenstände zum Sammeln"), ("26", "seltene Begleittiere")],
+        "how_title": "So funktioniert es",
+        "how": [
+            ("Tätigkeit wählen", "Holzfällen, Fischen, Schmieden oder ein Kampf – ein Tipp, und dein Held legt los."),
+            ("Handy weglegen", "Dein Held macht weiter, während das Spiel zu ist: bis zu 4 Stunden, mit Unterstützer 8."),
+            ("Zurückkommen und wachsen", "Beute einsammeln, Stufen aufsteigen, bessere Ausrüstung schmieden und neue Gebiete freischalten."),
+        ],
+        "features_title": "Was dich erwartet",
+        "features": [
+            ("offline", "Spielt weiter, während du weg bist", "Wähl eine Tätigkeit und mach das Spiel zu. Wenn du zurückkommst, siehst du genau, was dein Held geschafft hat: Holz, Erfahrung, neue Stufen und manchmal ein seltenes Begleittier."),
+            ("drawer2", "23 Fertigkeiten bis Stufe 99", "Holzfällen, Bergbau, Fischen, Jagd, Diebstahl und Gewandtheit bringen Rohstoffe. Schmieden, Kochen, Bognerei, Runenfertigung, Handwerk und Kräuterkunde machen daraus Ausrüstung, Essen, Pfeile, Runen und Tränke. Jedes Ziel hat seine eigene Meisterschaft, die es mit der Zeit schneller macht."),
+            ("smithing", "Schmiede deine Ausrüstung", "Aus Erz werden Barren, aus Barren Schwerter, Helme und Rüstungen. Jedes Metall ist stärker als das letzte, und mit wachsender Meisterschaft sparst du Material."),
+            ("slayer_combat", "Nahkampf, Bogen und Magie", "Drei Kampfstile, die sich gegenseitig schlagen. Kämpf gegen 41 Gegner in zwölf Gebieten, lade Spezialangriffe auf und nimm Kopfgeld-Aufträge an. Leg Essen und Tränke ein, dann kämpft dein Held auch offline weiter."),
+            ("dungeon", "Verliese und Bosse", "Fünf Verliese mit einem Boss und einer Truhe am Ende, dazu mächtige Bosse, die eigene, seltene Boss-Begleiter hinterlassen."),
+            ("farming3", "Beete und Tiere", "Pflanz Kräuter und Gemüse, die nebenbei wachsen, halte Bienen und Seidenraupen und ernte, wann immer du vorbeischaust."),
+            ("pet", "Finde seltene Begleittiere", "26 Begleittiere, jedes mit eigenem Bonus. Sie tauchen selten auf, beim Holzfällen, Fischen oder im Kampf – auch während du offline bist."),
+            ("construction2", "Bau deine Feste", "Bau Sägewerk, Schmelzhütte, Lagerhaus und mehr aus. Jedes Gebäude der Feste gibt dir dauerhafte Boni."),
+            ("quests", "Hilf dem Dorf", "44 Abenteuer von den Leuten aus dem Dorf, Bestellungen, Erfolge und ein Sammelbuch mit 283 Gegenständen."),
+            ("guild_members", "Gilden", "Gründe eine Gilde oder tritt einer bei. Gemeinsam schafft ihr das Wochenziel, besiegt den Gildenboss und stürmt den Raid. Anführer und Offiziere laden ein und verwalten die Mitglieder."),
+            ("market", "Handel in der Markthalle", "Biete deine Waren anderen Spielern an und bestimm selbst den Preis. Was verkauft ist, wartet als Gold auf dich."),
+            ("weekly", "Wettbewerb und Weltboss", "Jede Woche ein neues Ziel für alle, mit Belohnungen und Rangliste. Am Wochenende kämpfen alle zusammen gegen den Weltboss, und Freunde kannst du anfeuern, damit ihr beide mehr Erfahrung bekommt."),
+        ],
+        "fair_title": "Fair spielbar",
+        "fair": [
+            ("Kostenlos", "Jede Fertigkeit, jedes Gebiet und jeder Boss ist ohne Bezahlen erreichbar."),
+            ("Werbung nur, wenn du willst", "Videos nur, wenn du sie startest, etwa für einen EP-Schub."),
+            ("Kein Energiesystem", "Spiel, so lange du willst – oder mal eine Weile gar nicht."),
+            ("Dein Fortschritt ist sicher", "Sicherung in der Cloud und ein Code, um den Spielstand aufs neue Handy mitzunehmen."),
+        ],
+        "shots_title": "Bilder aus dem Spiel",
+        "prev": "Zurück", "next": "Weiter",
+        "faq_title": "Fragen",
+        "faq": [
+            ("Was ist ein Idle-Spiel?", "Ein Spiel, das ohne dich weiterläuft. Du bestimmst, was dein Held tut, und er macht weiter, auch wenn die App zu ist. Kurz reinschauen oder eine Stunde spielen – beides passt."),
+            ("Wann erscheint Bannerfall Idle?", "Der Betatest auf dem iPhone (TestFlight) und unter Android (Google Play) startet in Kürze. Die Veröffentlichung folgt, sobald das Feedback eingearbeitet ist."),
+            ("Hat das etwas mit Bannerfall: Tiny Battle zu tun?", "Es kommt vom selben Entwickler und hat denselben Look, ist aber ein eigenes Spiel mit eigenem Spielstand. Du brauchst Bannerfall nicht, um es zu spielen."),
+            ("Kostet das Spiel etwas?", "Nein. Bannerfall Idle ist kostenlos. Der freiwillige Einmalkauf „Unterstützer“ verlängert die Offline-Zeit auf 8 Stunden und bringt ein paar Annehmlichkeiten, aber alles ist auch durchs Spielen erreichbar."),
+            ("Welche Sprachen gibt es?", "Deutsch und Englisch. Das Spiel folgt der Sprache deines Geräts und lässt sich in den Einstellungen umstellen."),
+            ("Wer steckt hinter Bannerfall Idle?", "Bannerfall Idle ist ein Indie-Spiel von Jakob Ehmann aus Österreich."),
+        ],
+        "end_title": "Willst du vor allen anderen spielen?",
+        "end_text": "Mach beim Betatest mit, auf dem iPhone oder unter Android. Dein Feedback formt das Spiel.",
+        "end_cta": "Beim Betatest mitmachen",
+        "other": "Auch von uns: <a href=\"../index.html\">Bannerfall: Tiny Battle</a>, ein Lane-Battle-Spiel mit 22 Einheiten.",
+        "title": "Bannerfall Idle – Idle-Rollenspiel für iPhone & Android",
+    },
+}
+IDLE_SHOTS = ["overview", "fishing", "bank", "collection", "potion", "boss_fight", "guild_boss", "ranking", "friends", "world"]
+
+
+def idle(lang):
+    p = T[lang]["prefix"] + "../"
+    h = IDLE[lang]
+    img = lambda n: f"{p}img/idle/{lang}/{n}.jpg"
+    is_open = bool(IDLE_TESTFLIGHT_URL) or IDLE_ANDROID_OPEN
+    mail = lambda dev: f"mailto:{CONTACT}?subject=Bannerfall%20Idle%20Beta%20({dev})"
+    urls = {"testflight_app": TESTFLIGHT_APP_URL, "testflight": IDLE_TESTFLIGHT_URL, "group": ANDROID_BETA_URL,
+            "optin": IDLE_ANDROID_OPTIN_URL, "store": IDLE_ANDROID_STORE_URL}
+
+    def step(i, t, k, x, live):
+        # Noch nicht verfügbare Schritte als graue Fläche ohne Link.
+        if live:
+            btn = f'<a class="btn gold" href="{urls[k]}" target="_blank" rel="noopener">{gold_face(p, t)}</a>'
+        else:
+            btn = f'<span class="btn off">{t}<small>{h["soon"]}</small></span>'
+        return f'<li><span class="snum">{i + 1}</span><div>{btn}<p>{x}</p></div></li>'
+
+    if IDLE_TESTFLIGHT_URL:
+        ios = "".join(step(i, t, k, x, True) for i, (t, k, x) in enumerate(h["ios_steps"]))
+    else:
+        ios = (f'<li><span class="snum">1</span><div><a class="btn gold" href="{mail("iPhone")}">{gold_face(p, h["notify"])}</a>'
+               f'<p>{h["notify_ios"]}</p></div></li>')
+    android = "".join(step(i, t, k, x, IDLE_ANDROID_OPEN or k == "group") for i, (t, k, x) in enumerate(h["android_steps"]))
+    beta_cards = (f'<div class="bcard ios"><h3>iPhone</h3><ol class="asteps">{ios}</ol></div>'
+                  f'<div class="bcard android"><h3>Android</h3><ol class="asteps">{android}</ol></div>')
+    facts = "".join(f'<div class="fact"><b>{n}</b><span>{t}</span></div>' for n, t in h["facts"])
+    how = "".join(f'<li class="step"><span class="num">{gold_face(p, i + 1)}</span><h3>{t}</h3><p>{x}</p></li>' for i, (t, x) in enumerate(h["how"]))
+    feats = "".join(
+        f'<article class="row{" flip" if i % 2 else ""}"><div class="shot"><img src="{img(n)}" alt="{t}" loading="lazy" width="720" height="1280"></div>'
+        f'<div class="copy"><h3>{t}</h3><p>{x}</p></div></article>'
+        for i, (n, t, x) in enumerate(h["features"])
+    )
+    fair = "".join(f'<div class="feature"><h3>{t}</h3><p>{x}</p></div>' for t, x in h["fair"])
+    shots = "".join(f'<img src="{img(n)}" alt="Bannerfall Idle" loading="lazy" width="720" height="1280">' for n in IDLE_SHOTS)
+    dots = "".join(f'<button type="button" class="dot{" on" if i == 0 else ""}" aria-label="{i + 1}"></button>' for i in range(len(IDLE_SHOTS)))
+    faq = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in h["faq"])
+    body = f"""
+<main class="idle">
+<section class="hero">
+<div>
+<span class="tag">{gold_face(p, h["tag_open" if is_open else "tag_soon"])}</span>
+<h1>Bannerfall Idle</h1>
+<p class="sub">{h["sub"]}</p>
+<p class="lead">{h["lead"]}</p>
+<div class="cta"><a class="btn gold" href="#beta">{gold_face(p, h["end_cta"])}</a><a class="btn ghost" href="#features">{h["cta"]}</a></div>
+</div>
+<div class="phones">
+<div class="phone back"><img src="{img("drawer2")}" alt="" width="720" height="1280"></div>
+<div class="phone"><img src="{img("slayer_combat")}" alt="Bannerfall Idle" width="720" height="1280"></div>
+</div>
+</section>
+<section class="facts">{facts}</section>
+<section><h2>{h["how_title"]}</h2><ol class="steps">{how}</ol></section>
+<section id="features"><h2>{h["features_title"]}</h2><div class="rows">{feats}</div></section>
+<section class="slider"><div class="slider-head"><h2>{h["shots_title"]}</h2><div class="arrows"><button type="button" class="arrow" data-dir="-1" aria-label="{h["prev"]}">{gold_face(p, "‹")}</button><button type="button" class="arrow" data-dir="1" aria-label="{h["next"]}">{gold_face(p, "›")}</button></div></div><div class="gallery">{shots}</div><div class="dots">{dots}</div></section>
+<section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
+<section class="beta" id="beta"><h2>{h["beta_title"]}</h2><p class="section-lead">{h["beta_lead"]}</p><div class="bcards">{beta_cards}</div></section>
+<section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
+<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="#beta">{gold_face(p, h["end_cta"])}</a><p class="other">{h["other"]}</p></section>
+</main>"""
+    body += "<script>\n" + PAGE_JS + "</script>"
+    page(lang, "index.html", h["title"], body, h["lead"], idle=True)
+
+
 for lang in ("en", "de"):
+    idle(lang)
     home(lang)
     support(lang)
     imprint(lang)
