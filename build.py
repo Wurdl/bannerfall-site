@@ -16,7 +16,7 @@ ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehman
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "October 21, 2026", "de": "21. Oktober 2026"}
-UPDATED_IDLE = {"en": "November 4, 2026", "de": "4. November 2026"}
+UPDATED_IDLE = {"en": "November 7, 2026", "de": "7. November 2026"}
 
 T = {
     "en": {
@@ -641,12 +641,19 @@ def privacy(lang):
 
 def privacy_idle(lang):
     """Datenschutzerklärung für das zweite Spiel „Bannerfall Idle“ (eigenes Firebase-Projekt bannerfall-idle, Frankfurt).
-    Stand 4.11.2026: nur Cloud-Speicher, keine Werbung, keine Käufe, keine Statistik. Kommt das dazu, hier ergänzen."""
+    Stand 7.11.2026: Cloud-Speicher, Spielername, Ranglisten, Wochen-Wettbewerb, Gilden, Freunde, Markthalle, Weltboss
+    (alles Firestore), freiwillige Belohnungs-Videos (AdMob mit UMP-Einwilligung, kein ATT), Einmalkauf „Unterstützer“.
+    Statistik nur lokal auf dem Gerät (nicht übertragen). Kommt etwas dazu, hier ergänzen."""
     if lang == "en":
         rows = [
-            ("Random anonymous player ID and sign-in token (created by Firebase Authentication)", "Assigning your save game, protection against access by others", "Art. 6(1)(b) GDPR (providing the game)"),
-            ("Save game (skills, items, gold, progress, settings) and one backup copy per day (the last 10)", "Cloud backup, restoring after reinstalling, playing on several devices", "Art. 6(1)(b) GDPR"),
+            ("Random anonymous player ID and sign-in token (created by Firebase Authentication)", "Assigning your save game and online entries, protection against access by others", "Art. 6(1)(b) GDPR (providing the game)"),
+            ("Save game (skills, items, gold, progress, settings, friends list) and one backup copy per day (the last 10)", "Cloud backup, restoring after reinstalling, playing on several devices", "Art. 6(1)(b) GDPR"),
             ("Link code from “Link device” (valid for 15 minutes)", "Connecting another device to your save game", "Art. 6(1)(b) GDPR"),
+            ("Player name you choose, player number (shown as “Player ID” in the game, derived from the anonymous player ID), experience per skill, defeated enemies, quest points, current activity, guild", "Public rankings, weekly contest, finding and adding friends", "Art. 6(1)(b) GDPR"),
+            ("Guild data: guild name, members and their roles, invitations and join requests, contributions to weekly goal, guild boss and raid, guild news (e.g. level 99 reached) and congratulations", "Playing together in a guild", "Art. 6(1)(b) GDPR"),
+            ("Cheers between friends (who, day), points in the weekend world boss", "Social features of the game", "Art. 6(1)(b) GDPR"),
+            ("Market hall: your offers (item, quantity, price, your player name) and sales", "Trading items with other players", "Art. 6(1)(b) GDPR"),
+            ("Advertising data processed by Google AdMob (see section 4)", "Showing optional reward videos", "Art. 6(1)(a) GDPR (consent) for personalized ads; otherwise Art. 6(1)(f) GDPR"),
         ]
         table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
         body = f"""<main class="doc">
@@ -656,26 +663,35 @@ def privacy_idle(lang):
 <p>{ADDRESS}<br>Email: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>2. Data processed by the game</h2>
 <div class="table-scroll"><table><tr><th>Data</th><th>Purpose</th><th>Legal basis</th></tr>{table}</table></div>
-<p>The game does <strong>not</strong> collect your real name, email address, phone number, contacts or location. It contains <strong>no advertising, no in-app purchases and no analytics or tracking</strong>, and it does not use the advertising identifier (IDFA / Android advertising ID). On iOS the player ID and sign-in token are additionally stored in your device's keychain, so your save game can be restored after reinstalling the app; this data stays on your device.</p>
+<p>The game does <strong>not</strong> collect your real name, email address, phone number, contacts or location. There is no chat. <strong>Visible to other players</strong> are your player name, your player number, your rankings and experience, your current activity (for friends), your guild and its news, and your market offers. Please don't use your real name as player name or guild name. The game contains <strong>no analytics or tracking</strong>: a few game events (e.g. video watched, purchase) are only counted on your device and are not transmitted. On iOS the game does not ask for permission to track you across apps (App Tracking Transparency); the advertising identifier (IDFA) is therefore not available to the game or to AdMob. On Android, AdMob may use the Android advertising ID (see section 4); you can reset or delete it at any time in your device settings. On iOS the player ID and sign-in token are additionally stored in your device's keychain, so your save game can be restored after reinstalling the app; this data stays on your device.</p>
 <h2>3. Google Firebase</h2>
-<p>Save games and link codes are stored with Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) in the data center <strong>Frankfurt am Main (europe-west3)</strong>. Google acts as processor. A transfer to third countries cannot be completely ruled out for Google services; Google relies on the EU-US Data Privacy Framework and standard contractual clauses.</p>
-<h2>4. Retention</h2>
-<p>Your save game is stored as long as the player ID is used and deleted no later than 24 months after the last use. Of the daily backup copies only the last 10 are kept. Link codes expire after 15 minutes and are deleted when used.</p>
-<h2>5. Your rights</h2>
-<p>You have the right to access, rectification, erasure, restriction of processing, data portability and objection (Art. 15–21 GDPR). To delete your data, send an email to <a href="mailto:{CONTACT}">{CONTACT}</a>. So we can find your save game, please include a code from Settings → “Link device” (you don't need to redeem it). You also have the right to lodge a complaint with a supervisory authority, in Austria the Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
-<h2>6. Children</h2>
-<p>The game is not directed at children under 13.</p>
-<h2>7. This website</h2>
+<p>Save games, link codes, rankings, guild, friend and market data are stored with Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) in the data center <strong>Frankfurt am Main (europe-west3)</strong>. Google acts as processor. A transfer to third countries cannot be completely ruled out for Google services; Google relies on the EU-US Data Privacy Framework and standard contractual clauses.</p>
+<h2>4. Advertising (Google AdMob)</h2>
+<p>The game offers optional reward videos (e.g. an experience boost or doubling the loot collected while offline). Nobody has to watch them, and everything in the game can also be reached without videos. The videos are provided by Google AdMob (Google Ireland Limited). When an ad is requested or shown, Google processes data such as your IP address, device and app information, the app-specific vendor identifier (iOS) or the Android advertising ID (Android) and your interactions with the ad, to deliver ads, measure them and prevent fraud. In the EU/EEA, the UK and Switzerland the game asks for your <strong>consent</strong> before personalized ads are shown (consent dialog by Google). Without consent, only non-personalized ads are shown. You can change your choice at any time under Settings → “Privacy settings (ads)” in the game. With the “Supporter” purchase no ad videos are shown. More: <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from apps that use its services</a>.</p>
+<h2>5. In-app purchases</h2>
+<p>Purchases are processed exclusively by Apple (App Store) or Google (Google Play). We do not receive your payment details; we only receive confirmation of which product was bought, to credit it in the game.</p>
+<h2>6. Retention</h2>
+<p>Your save game and the online data linked to your player ID (rankings, guild, friend and market entries) are stored as long as the player ID is used and deleted no later than 24 months after the last use. Of the daily backup copies only the last 10 are kept. Link codes expire after 15 minutes and are deleted when used. Market offers expire after 3 days.</p>
+<h2>7. Your rights</h2>
+<p>You have the right to access, rectification, erasure, restriction of processing, data portability and objection (Art. 15–21 GDPR), and to withdraw your consent at any time with effect for the future. To delete your data, send an email to <a href="mailto:{CONTACT}">{CONTACT}</a>. So we can find your data, please include your player number (“Player ID” on the “Competition” page, e.g. #K7Q2-9F4M) or a code from Settings → “Link device” (you don't need to redeem it). You also have the right to lodge a complaint with a supervisory authority, in Austria the Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
+<h2>8. Children</h2>
+<p>The game is not directed at children under 13. In the EU, personalized advertising requires the consent of a parent or guardian for users under 16; younger players should not consent to personalized ads.</p>
+<h2>9. This website</h2>
 <p>This website is hosted by GitHub Pages (GitHub Inc., USA). When you visit it, GitHub processes technical access data (e.g. IP address) to deliver the page and for security. Fonts are loaded from Google Fonts (Google Ireland Limited), which also receives your IP address. The website does not use cookies or tracking.</p>
-<h2>8. Changes</h2>
-<p>We will update this privacy policy when the game or the law changes, in particular before features such as optional ads or purchases are added. The current version is always available on this page.</p>
+<h2>10. Changes</h2>
+<p>We will update this privacy policy when the game or the law changes. The current version is always available on this page.</p>
 </main>"""
         page(lang, "idle-privacy.html", "Privacy Policy – Bannerfall Idle", body)
     else:
         rows = [
-            ("Zufällige, anonyme Spieler-Kennung und Anmelde-Token (von Firebase Authentication erzeugt)", "Zuordnung des Spielstands, Schutz vor fremdem Zugriff", "Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Spiels)"),
-            ("Spielstand (Fertigkeiten, Gegenstände, Gold, Fortschritt, Einstellungen) und eine Sicherungskopie pro Tag (die letzten 10)", "Sicherung in der Cloud, Wiederherstellen nach dem Neuinstallieren, Spielen auf mehreren Geräten", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Zufällige, anonyme Spieler-Kennung und Anmelde-Token (von Firebase Authentication erzeugt)", "Zuordnung des Spielstands und der Online-Einträge, Schutz vor fremdem Zugriff", "Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Spiels)"),
+            ("Spielstand (Fertigkeiten, Gegenstände, Gold, Fortschritt, Einstellungen, Freundesliste) und eine Sicherungskopie pro Tag (die letzten 10)", "Sicherung in der Cloud, Wiederherstellen nach dem Neuinstallieren, Spielen auf mehreren Geräten", "Art. 6 Abs. 1 lit. b DSGVO"),
             ("Code aus „Gerät verbinden“ (15 Minuten gültig)", "Verbinden eines weiteren Geräts mit deinem Spielstand", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Selbst gewählter Spielername, Spieler-Nr. (aus der Spieler-Kennung abgeleitet), Erfahrung je Fertigkeit, besiegte Gegner, Abenteuer-Punkte, aktuelle Tätigkeit, Gilde", "Öffentliche Ranglisten, Wochen-Wettbewerb, Freunde finden und hinzufügen", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Gilden-Daten: Gildenname, Mitglieder und ihre Rollen, Einladungen und Beitrittsanfragen, Beiträge zu Wochenziel, Gildenboss und Raid, Gilden-Meldungen (z. B. Stufe 99 erreicht) und Glückwünsche", "Gemeinsames Spielen in einer Gilde", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Anfeuern unter Freunden (wer, an welchem Tag), Punkte beim Weltboss am Wochenende", "Gemeinsame Funktionen des Spiels", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Markthalle: deine Angebote (Gegenstand, Menge, Preis, dein Spielername) und Verkäufe", "Handel mit anderen Spielern", "Art. 6 Abs. 1 lit. b DSGVO"),
+            ("Werbedaten, verarbeitet von Google AdMob (siehe Abschnitt 4)", "Anzeige freiwilliger Belohnungs-Videos", "Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) für personalisierte Werbung, sonst Art. 6 Abs. 1 lit. f DSGVO"),
         ]
         table = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
         body = f"""<main class="doc">
@@ -685,19 +701,23 @@ def privacy_idle(lang):
 <p>{ADDRESS.replace(" / Austria", "")}<br>E-Mail: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 <h2>2. Welche Daten das Spiel verarbeitet</h2>
 <div class="table-scroll"><table><tr><th>Daten</th><th>Zweck</th><th>Rechtsgrundlage</th></tr>{table}</table></div>
-<p>Das Spiel erhebt <strong>keine</strong> echten Namen, E-Mail-Adressen, Telefonnummern, Kontakte oder Standortdaten. Es enthält <strong>keine Werbung, keine Käufe im Spiel und keine Statistik oder Nachverfolgung</strong> und verwendet keine Werbe-ID (IDFA bzw. Android-Werbe-ID). Unter iOS liegen Spieler-Kennung und Anmelde-Token zusätzlich im Schlüsselbund deines Geräts, damit der Spielstand nach dem Neuinstallieren zurückkommt; diese Daten bleiben auf deinem Gerät.</p>
+<p>Das Spiel erhebt <strong>keine</strong> echten Namen, E-Mail-Adressen, Telefonnummern, Kontakte oder Standortdaten. Es gibt keinen Chat. <strong>Für andere Spieler sichtbar</strong> sind dein Spielername, deine Spieler-Nr., deine Ranglisten-Plätze und Erfahrung, deine aktuelle Tätigkeit (für Freunde), deine Gilde und ihre Meldungen sowie deine Angebote in der Markthalle. Bitte verwende keinen echten Namen als Spieler- oder Gildennamen. Das Spiel enthält <strong>keine Statistik oder Nachverfolgung</strong>: Einige Spielereignisse (z. B. Video angesehen, Kauf) werden nur auf deinem Gerät gezählt und nicht übertragen. Unter iOS fragt das Spiel nicht nach der Erlaubnis, dich app-übergreifend zu verfolgen (App Tracking Transparency); die Werbe-ID (IDFA) steht dem Spiel und AdMob daher nicht zur Verfügung. Unter Android kann AdMob die Android-Werbe-ID verwenden (siehe Abschnitt 4); du kannst sie jederzeit in den Geräteeinstellungen zurücksetzen oder löschen. Unter iOS liegen Spieler-Kennung und Anmelde-Token zusätzlich im Schlüsselbund deines Geräts, damit der Spielstand nach dem Neuinstallieren zurückkommt; diese Daten bleiben auf deinem Gerät.</p>
 <h2>3. Google Firebase</h2>
-<p>Spielstände und Verbindungscodes werden bei Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im Rechenzentrum <strong>Frankfurt am Main (europe-west3)</strong> gespeichert. Google ist Auftragsverarbeiter. Eine Übermittlung in Drittländer kann bei Google-Diensten nicht vollständig ausgeschlossen werden; Google stützt sich dafür auf das EU-US Data Privacy Framework und Standardvertragsklauseln.</p>
-<h2>4. Speicherdauer</h2>
-<p>Der Spielstand wird gespeichert, solange die Spieler-Kennung genutzt wird, und spätestens 24 Monate nach der letzten Nutzung gelöscht. Von den täglichen Sicherungskopien bleiben nur die letzten 10. Verbindungscodes verfallen nach 15 Minuten und werden beim Einlösen gelöscht.</p>
-<h2>5. Deine Rechte</h2>
-<p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO). Für eine Löschung genügt eine E-Mail an <a href="mailto:{CONTACT}">{CONTACT}</a>. Damit wir deinen Spielstand finden, schick bitte einen Code aus Einstellungen → „Gerät verbinden“ mit (du musst ihn nicht einlösen). Außerdem kannst du dich bei einer Aufsichtsbehörde beschweren, in Österreich bei der Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
-<h2>6. Kinder</h2>
-<p>Das Spiel richtet sich nicht an Kinder unter 13 Jahren.</p>
-<h2>7. Diese Website</h2>
+<p>Spielstände, Verbindungscodes, Ranglisten-, Gilden-, Freundes- und Markthallen-Daten werden bei Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im Rechenzentrum <strong>Frankfurt am Main (europe-west3)</strong> gespeichert. Google ist Auftragsverarbeiter. Eine Übermittlung in Drittländer kann bei Google-Diensten nicht vollständig ausgeschlossen werden; Google stützt sich dafür auf das EU-US Data Privacy Framework und Standardvertragsklauseln.</p>
+<h2>4. Werbung (Google AdMob)</h2>
+<p>Das Spiel bietet freiwillige Belohnungs-Videos an (z. B. für einen EP-Schub oder um die Offline-Beute zu verdoppeln). Niemand muss sie ansehen, alles im Spiel ist auch ohne Videos erreichbar. Die Videos stammen von Google AdMob (Google Ireland Limited). Beim Anfordern und Anzeigen einer Anzeige verarbeitet Google Daten wie IP-Adresse, Geräte- und App-Informationen, die app-spezifische Hersteller-Kennung (iOS) bzw. die Android-Werbe-ID (Android) und deine Interaktionen mit der Anzeige, um Anzeigen auszuliefern, zu messen und Betrug zu verhindern. In der EU/im EWR, im Vereinigten Königreich und in der Schweiz fragt das Spiel vor personalisierter Werbung nach deiner <strong>Einwilligung</strong> (Einwilligungsdialog von Google). Ohne Einwilligung werden nur nicht personalisierte Anzeigen gezeigt. Deine Auswahl kannst du jederzeit im Spiel unter Einstellungen → „Datenschutz-Einstellungen (Werbung)“ ändern. Mit dem Kauf „Unterstützer“ werden keine Werbevideos mehr angezeigt. Mehr dazu: <a href="https://policies.google.com/technologies/partner-sites?hl=de">Wie Google Daten aus Apps verwendet</a>.</p>
+<h2>5. Käufe im Spiel</h2>
+<p>Käufe werden ausschließlich von Apple (App Store) bzw. Google (Google Play) abgewickelt. Wir erhalten keine Zahlungsdaten, sondern nur die Bestätigung, welches Produkt gekauft wurde, um es im Spiel gutzuschreiben.</p>
+<h2>6. Speicherdauer</h2>
+<p>Der Spielstand und die Online-Daten zu deiner Spieler-Kennung (Ranglisten-, Gilden-, Freundes- und Markthallen-Einträge) werden gespeichert, solange die Spieler-Kennung genutzt wird, und spätestens 24 Monate nach der letzten Nutzung gelöscht. Von den täglichen Sicherungskopien bleiben nur die letzten 10. Verbindungscodes verfallen nach 15 Minuten und werden beim Einlösen gelöscht. Angebote in der Markthalle laufen nach 3 Tagen ab.</p>
+<h2>7. Deine Rechte</h2>
+<p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht, eine Einwilligung jederzeit mit Wirkung für die Zukunft zu widerrufen. Für eine Löschung genügt eine E-Mail an <a href="mailto:{CONTACT}">{CONTACT}</a>. Damit wir deine Daten finden, schick bitte deine Spieler-Nr. mit (steht auf der Seite „Wettbewerb“, z. B. #K7Q2-9F4M) oder einen Code aus Einstellungen → „Gerät verbinden“ (du musst ihn nicht einlösen). Außerdem kannst du dich bei einer Aufsichtsbehörde beschweren, in Österreich bei der Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
+<h2>8. Kinder</h2>
+<p>Das Spiel richtet sich nicht an Kinder unter 13 Jahren. In der EU braucht personalisierte Werbung bei Nutzern unter 16 Jahren die Zustimmung eines Elternteils oder Erziehungsberechtigten; jüngere Spieler sollten personalisierter Werbung nicht zustimmen.</p>
+<h2>9. Diese Website</h2>
 <p>Diese Website wird von GitHub Pages (GitHub Inc., USA) bereitgestellt. Beim Aufruf verarbeitet GitHub technische Zugriffsdaten (z. B. IP-Adresse), um die Seite auszuliefern und zur Sicherheit. Schriftarten werden von Google Fonts (Google Ireland Limited) geladen; dabei wird ebenfalls deine IP-Adresse übertragen. Die Website verwendet keine Cookies und kein Tracking.</p>
-<h2>8. Änderungen</h2>
-<p>Wir passen diese Datenschutzerklärung an, wenn sich das Spiel oder die Rechtslage ändert, insbesondere bevor Funktionen wie freiwillige Werbung oder Käufe dazukommen. Die aktuelle Fassung findest du immer auf dieser Seite.</p>
+<h2>10. Änderungen</h2>
+<p>Wir passen diese Datenschutzerklärung an, wenn sich das Spiel oder die Rechtslage ändert. Die aktuelle Fassung findest du immer auf dieser Seite.</p>
 </main>"""
         page(lang, "idle-datenschutz.html", "Datenschutzerklärung – Bannerfall Idle", body)
 
