@@ -13,6 +13,9 @@ ANDROID_BETA_URL = "https://groups.google.com/g/bannerfall-tester"
 # Android-Test: nach dem Gruppenbeitritt „Tester werden“ (eigene Play-Seite) und dann im Play Store installieren.
 ANDROID_OPTIN_URL = "https://play.google.com/apps/testing/de.jakobehmann.bannerfall"
 ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehmann.bannerfall"
+# Launch-Tag: auf True setzen, dann zeigt die Startseite „Jetzt im App Store“ statt der iPhone-Beta (Android bleibt Beta).
+LAUNCHED = True
+APP_STORE_URL = "https://apps.apple.com/app/id6824882107"
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "November 8, 2026", "de": "8. November 2026"}
@@ -52,8 +55,8 @@ def page(lang, file, title, body, description="", idle=False):
     nav = "".join(
         f'<a href="{href}"{current if href == file else ""}>{label}</a>' for href, label in nav_items
     )
-    alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html", "idle-privacy.html": "idle-datenschutz.html"}.get(file, "index.html") if lang == "en" else \
-        "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html", "idle-datenschutz.html": "idle-privacy.html"}.get(file, "index.html")
+    alt = "de/" + {"index.html": "index.html", "support.html": "support.html", "privacy.html": "datenschutz.html", "imprint.html": "impressum.html", "idle-privacy.html": "idle-datenschutz.html", "presskit.html": "presskit.html"}.get(file, "index.html") if lang == "en" else \
+        "../" + {"index.html": "", "support.html": "support.html", "datenschutz.html": "privacy.html", "impressum.html": "imprint.html", "idle-datenschutz.html": "idle-privacy.html", "presskit.html": "presskit.html"}.get(file, "index.html")
     if idle:
         alt = "../de/idle/" if lang == "en" else "../../idle/"
     html = f"""<!doctype html>
@@ -81,7 +84,7 @@ def page(lang, file, title, body, description="", idle=False):
 </header>
 {body}
 </div>
-<footer><div class="wrap"><span>{footer}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in nav_items[1:])}</span></div></footer>
+<footer><div class="wrap"><span>{footer}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in nav_items[1:] + ([] if idle else [("presskit.html", "Press kit" if lang == "en" else "Presse")]))}</span></div></footer>
 </body>
 </html>
 """
@@ -337,6 +340,33 @@ HOME = {
 }
 
 
+# Startseite nach dem iOS-Launch (LAUNCHED = True): ersetzt die Beta-Texte, Android bleibt im offenen Test.
+HOME_LAUNCHED = {
+    "en": {
+        "tag": "Out now on iPhone · Android in open test",
+        "beta_title": "Play now",
+        "beta_lead": "Bannerfall is out on iPhone and iPad – free. On Android it's in open testing on Google Play, the full release follows soon.",
+        "ios_card": ("ios", "iPhone & iPad", [("Download on the App Store", "appstore", "Free – with optional purchases.")]),
+        "faq_when": ("When does Bannerfall come out?", "Bannerfall is out now on iPhone and iPad. On Android it's in open testing on Google Play – the full release follows soon."),
+        "faq_android": ("Is there an Android version?", "Yes! Android is in open testing on Google Play – use the Android card at the top of this page."),
+        "end_title": "Ready to storm the castle?",
+        "end_text": "Bannerfall is free on the App Store. On Android, join the open test on Google Play.",
+        "end_cta": "Play now",
+    },
+    "de": {
+        "tag": "Jetzt auf dem iPhone · Android im offenen Test",
+        "beta_title": "Jetzt spielen",
+        "beta_lead": "Bannerfall ist auf iPhone und iPad erschienen – kostenlos. Unter Android läuft der offene Test bei Google Play, der volle Start folgt bald.",
+        "ios_card": ("ios", "iPhone & iPad", [("Im App Store laden", "appstore", "Kostenlos – mit freiwilligen Käufen.")]),
+        "faq_when": ("Wann erscheint Bannerfall?", "Bannerfall ist jetzt auf iPhone und iPad erschienen. Unter Android läuft der offene Test bei Google Play – der volle Start folgt bald."),
+        "faq_android": ("Gibt es eine Android-Version?", "Ja! Android läuft im offenen Test bei Google Play – nimm die Android-Karte oben auf dieser Seite."),
+        "end_title": "Bereit, die Burg zu stürmen?",
+        "end_text": "Bannerfall ist kostenlos im App Store. Unter Android machst du beim offenen Test bei Google Play mit.",
+        "end_cta": "Jetzt spielen",
+    },
+}
+
+
 def form_label(text):
     # Auf schmalen Bildschirmen nur „I“/„II“ zeigen, das Wort davor blendet die CSS aus.
     word, _, num = text.rpartition(" ")
@@ -422,10 +452,15 @@ document.querySelectorAll('.slider').forEach(function (s) {
 def home(lang):
     p = T[lang]["prefix"]
     h = HOME[lang]
+    if LAUNCHED:
+        l = HOME_LAUNCHED[lang]
+        h = {**h, **{k: l[k] for k in ("tag", "beta_title", "beta_lead", "end_title", "end_text", "end_cta")},
+             "beta_cards": [l["ios_card"]] + [c for c in h["beta_cards"] if c[0] != "ios"],
+             "faq": [l["faq_when"], l["faq_android"]] + h["faq"][2:]}
     img = lambda n: f"{p}img/{lang}/{n}.jpg"
     beta = f"mailto:{CONTACT}?subject=" + ("Bannerfall%20Beta" if lang == "en" else "Bannerfall%20Betatest")
     urls = {"testflight_app": TESTFLIGHT_APP_URL, "testflight": TESTFLIGHT_URL, "group": ANDROID_BETA_URL,
-            "optin": ANDROID_OPTIN_URL, "store": ANDROID_STORE_URL}
+            "optin": ANDROID_OPTIN_URL, "store": ANDROID_STORE_URL, "appstore": APP_STORE_URL}
     # Je Handy eine Karte mit nummerierten Schritten; die Nummer steht als Kreis neben dem Knopf (nicht im Goldbild).
     beta_cards = "".join(
         f'<div class="bcard {cls}"><h3>{name}</h3><ol class="asteps">'
@@ -953,7 +988,110 @@ def idle(lang):
     page(lang, "index.html", h["title"], body, h["lead"], idle=True)
 
 
+# Pressekit (presskit.html, de/presskit.html). Bilder, Logo und Trailer als ZIP unter presskit/ (aus game/social_media/launch_outreach/presskit).
+RELEASE = {"en": "November 2026 (iOS) · Android: open test, release coming soon", "de": "November 2026 (iOS) · Android: offener Test, Start folgt bald"}
+PRESS = {
+    "en": {
+        "title": "Press kit – Bannerfall",
+        "lead": "Everything you need to write about Bannerfall: Tiny Battle. Screenshots, logo and trailer are free to use for coverage.",
+        "facts_title": "Fact sheet",
+        "facts": [
+            ("Title", "Bannerfall: Tiny Battle"),
+            ("Developer", "Jakob Ehmann, solo indie developer from Hausmannstätten near Graz, Austria"),
+            ("Release", None),
+            ("Platforms", "iPhone and iPad (iOS) · Android"),
+            ("Price", "Free to play, optional in-app purchases, optional reward videos, no energy system"),
+            ("Genre", "Lane battle strategy / army builder"),
+            ("Languages", "English, German"),
+            ("Engine", "Godot 4"),
+            ("Contact", None),
+        ],
+        "about_title": "About the game",
+        "about": [
+            "Bannerfall is a cute but tactical lane battle game: build your army, rain fire on the enemy and storm their castle before your own falls.",
+            "Every battle plays differently: each level-up offers three cards – new units, upgrades, abilities or spells. Between battles, players collect and ascend 22 units, forge gear with elemental effects, pick talent paths and take on a raid with eight bosses.",
+            "The game is fair to play: the whole campaign is free, there is no energy system, and videos are only shown when the player chooses one.",
+        ],
+        "features_title": "Key features",
+        "features": ["22 units, each transforming twice when ascended", "3 spells and a hero that can turn a battle", "A new card choice at every level-up", "Forge with fire, ice, poison, lightning and light", "Talent paths for every class", "Raid with 8 bosses and a visible set armour", "6 worlds with boss stages", "Tournaments, leaderboard, friends and invite codes"],
+        "dev_title": "About the developer",
+        "dev": "Bannerfall is made by Jakob Ehmann, a solo developer from Styria, Austria. Development started at the end of September 2026; about six weeks later the game launched on the App Store, with a public beta on iPhone and Android in between.",
+        "dl_title": "Downloads",
+        "dl": [("presskit/bannerfall_presskit.zip", "Everything as ZIP (screenshots EN/DE, logo, app icon, gameplay stills, launch trailer)")],
+        "links_title": "Links",
+        "store": "App Store",
+        "site": "Website",
+        "shots_title": "Screenshots",
+    },
+    "de": {
+        "title": "Presse – Bannerfall",
+        "lead": "Alles, was du für einen Bericht über Bannerfall: Tiny Battle brauchst. Screenshots, Logo und Trailer dürfen für die Berichterstattung frei verwendet werden.",
+        "facts_title": "Steckbrief",
+        "facts": [
+            ("Titel", "Bannerfall: Tiny Battle"),
+            ("Entwickler", "Jakob Ehmann, Solo-Indie-Entwickler aus Hausmannstätten bei Graz, Österreich"),
+            ("Erscheinen", None),
+            ("Plattformen", "iPhone und iPad (iOS) · Android"),
+            ("Preis", "Kostenlos spielbar, freiwillige Käufe, freiwillige Belohnungsvideos, kein Energiesystem"),
+            ("Genre", "Lane-Battle-Strategie / Armee aufbauen"),
+            ("Sprachen", "Deutsch, Englisch"),
+            ("Engine", "Godot 4"),
+            ("Kontakt", None),
+        ],
+        "about_title": "Über das Spiel",
+        "about": [
+            "Bannerfall ist ein niedliches, aber taktisches Lane-Battle-Spiel: Armee aufstellen, Feuer regnen lassen und die gegnerische Burg stürmen, bevor die eigene fällt.",
+            "Jeder Kampf läuft anders: Bei jedem Stufenaufstieg gibt es drei Karten zur Wahl – neue Einheiten, Verbesserungen, Fähigkeiten oder Zauber. Zwischen den Kämpfen sammeln Spieler 22 Einheiten und lassen sie aufsteigen, schmieden Ausrüstung mit Element-Wirkungen, wählen Talentwege und stellen sich einem Raid mit acht Bossen.",
+            "Das Spiel ist fair: Die ganze Kampagne ist kostenlos, es gibt kein Energiesystem, und Videos laufen nur, wenn man selbst eines wählt.",
+        ],
+        "features_title": "Das Wichtigste",
+        "features": ["22 Einheiten, jede verwandelt sich beim Aufstieg zweimal", "3 Zauber und ein Held, der Kämpfe dreht", "Bei jedem Stufenaufstieg eine neue Kartenwahl", "Schmiede mit Feuer, Eis, Gift, Blitz und Licht", "Talentwege für jede Klasse", "Raid mit 8 Bossen und sichtbarer Set-Rüstung", "6 Welten mit Boss-Stufen", "Turniere, Rangliste, Freunde und Einladungs-Codes"],
+        "dev_title": "Über den Entwickler",
+        "dev": "Bannerfall stammt von Jakob Ehmann, einem Solo-Entwickler aus der Steiermark. Die Entwicklung begann Ende September 2026; rund sechs Wochen später erschien das Spiel im App Store, dazwischen lief ein öffentlicher Betatest auf iPhone und Android.",
+        "dl_title": "Downloads",
+        "dl": [("presskit/bannerfall_presskit.zip", "Alles als ZIP (Screenshots DE/EN, Logo, App-Symbol, Spielszenen, Launch-Trailer)")],
+        "links_title": "Links",
+        "store": "App Store",
+        "site": "Website",
+        "shots_title": "Screenshots",
+    },
+}
+
+
+def presskit(lang):
+    t = PRESS[lang]
+    p = T[lang]["prefix"]
+    rows = "".join(
+        f"<tr><th>{k}</th><td>{v if v is not None else (RELEASE[lang] if i == 2 else f'<a href=\"mailto:{CONTACT}?subject=Bannerfall%20Press\">{CONTACT}</a>')}</td></tr>"
+        for i, (k, v) in enumerate(t["facts"]))
+    about = "".join(f"<p>{x}</p>" for x in t["about"])
+    feats = "".join(f"<li>{x}</li>" for x in t["features"])
+    dl = "".join(f'<li><a href="{p}{h}">{x}</a></li>' for h, x in t["dl"])
+    shots = "".join(f'<a href="{p}img/{lang}/{n}.jpg"><img src="{p}img/{lang}/{n}.jpg" alt="Bannerfall" loading="lazy" width="720" height="1280" style="width:31%;height:auto;margin:1%;border-radius:12px"></a>'
+                    for n in ["battle", "spell", "cards", "unit", "raid", "victory"])
+    body = f"""<main class="doc">
+<h1>{t["title"].split(" – ")[0]}</h1>
+<p>{t["lead"]}</p>
+<h2>{t["facts_title"]}</h2>
+<table>{rows}</table>
+<h2>{t["about_title"]}</h2>
+{about}
+<h2>{t["features_title"]}</h2>
+<ul>{feats}</ul>
+<h2>{t["dev_title"]}</h2>
+<p>{t["dev"]}</p>
+<h2>{t["dl_title"]}</h2>
+<ul>{dl}</ul>
+<h2>{t["shots_title"]}</h2>
+<div>{shots}</div>
+<h2>{t["links_title"]}</h2>
+<ul><li><a href="{APP_STORE_URL}">{t["store"]}</a></li><li><a href="{p}index.html">{t["site"]}</a></li></ul>
+</main>"""
+    page(lang, "presskit.html", t["title"], body, t["lead"])
+
+
 for lang in ("en", "de"):
+    presskit(lang)
     idle(lang)
     home(lang)
     support(lang)
