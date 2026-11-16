@@ -765,7 +765,7 @@ def privacy_idle(lang):
 # Beta-Links: leer bzw. False = „folgt in Kürze“ mit Knopf „Bescheid geben“ (E-Mail). Eintragen, sobald es sie gibt:
 # öffentlicher Link der externen TestFlight-Gruppe; True, sobald der geschlossene Test bei Google Play läuft.
 IDLE_TESTFLIGHT_URL = "https://testflight.apple.com/join/ukbr8v5b"
-IDLE_ANDROID_OPEN = False
+IDLE_ANDROID_OPEN = True
 IDLE_ANDROID_OPTIN_URL = "https://play.google.com/apps/testing/de.jakobehmann.bannerfallidle"
 IDLE_ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehmann.bannerfallidle"
 # Navigation der Idle-Seiten (Pfade wie von der Wurzel bzw. /de/ aus; page() setzt „../“ davor).
@@ -782,6 +782,8 @@ IDLE = {
         "tag_ios": "Beta open on iPhone · Android soon",
         "beta_lead_ios": "The iPhone beta is open – Android follows soon. Pick your phone – your feedback shapes the game.",
         "faq_when_ios": ("When does Bannerfall Idle come out?", "The beta is open on iPhone (TestFlight), Android (Google Play) follows soon. The release follows once the feedback is in."),
+        "beta_lead_all": "The beta is open on iPhone and Android. Pick your phone – your feedback shapes the game.",
+        "faq_when_all": ("When does Bannerfall Idle come out?", "The beta is open on iPhone (TestFlight) and Android (Google Play). The release follows once the feedback is in."),
         "sub": "Idle RPG",
         "lead": "A relaxed RPG that keeps playing on its own. Your hero chops trees, mines ore, forges swords and fights monsters – even while your phone is in your pocket.",
         "cta": "Discover the game",
@@ -851,6 +853,8 @@ IDLE = {
         "tag_ios": "Betatest läuft auf dem iPhone · Android folgt",
         "beta_lead_ios": "Der Betatest auf dem iPhone läuft – Android folgt bald. Wähl dein Handy – dein Feedback formt das Spiel.",
         "faq_when_ios": ("Wann erscheint Bannerfall Idle?", "Der Betatest auf dem iPhone (TestFlight) läuft, Android (Google Play) folgt bald. Die Veröffentlichung folgt, sobald das Feedback eingearbeitet ist."),
+        "beta_lead_all": "Der Betatest läuft auf dem iPhone und unter Android. Wähl dein Handy – dein Feedback formt das Spiel.",
+        "faq_when_all": ("Wann erscheint Bannerfall Idle?", "Der Betatest läuft auf dem iPhone (TestFlight) und unter Android (Google Play). Die Veröffentlichung folgt, sobald das Feedback eingearbeitet ist."),
         "sub": "Idle-Rollenspiel",
         "lead": "Ein entspanntes Rollenspiel, das sich von selbst weiterspielt. Dein Held fällt Bäume, schürft Erz, schmiedet Schwerter und kämpft gegen Monster – auch wenn das Handy in der Tasche ist.",
         "cta": "Spiel entdecken",
@@ -928,6 +932,11 @@ def idle(lang):
     if ios_only:
         when = h["faq_when_ios"]
         h = {**h, "tag_open": h["tag_ios"], "beta_lead": h["beta_lead_ios"],
+             "faq": [when if q == when[0] else (q, a) for q, a in h["faq"]]}
+    elif IDLE_TESTFLIGHT_URL and IDLE_ANDROID_OPEN:
+        # Beide offen: Einleitung und FAQ-Antwort sagen, dass der Test läuft (nicht „startet bald“).
+        when = h["faq_when_all"]
+        h = {**h, "beta_lead": h["beta_lead_all"],
              "faq": [when if q == when[0] else (q, a) for q, a in h["faq"]]}
     mail = lambda dev: f"mailto:{CONTACT}?subject=Bannerfall%20Idle%20Beta%20({dev})"
     urls = {"testflight_app": TESTFLIGHT_APP_URL, "testflight": IDLE_TESTFLIGHT_URL, "group": ANDROID_BETA_URL,
