@@ -363,6 +363,7 @@ h2 { font-size: 34px; margin: 0 0 18px; }
 }
 .final h2 { font-size: clamp(28px, 4vw, 40px); }
 .final p { color: var(--muted); max-width: 34em; margin: 0 auto 22px; }
+.final .cta { justify-content: center; margin-top: 0; }
 
 /* Textseiten (Datenschutz, Impressum, Support) */
 .doc {

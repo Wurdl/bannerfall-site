@@ -16,6 +16,8 @@ ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=de.jakobehman
 # Launch-Tag: auf True setzen, dann zeigt die Startseite „Jetzt im App Store“ statt der iPhone-Beta (Android bleibt Beta).
 LAUNCHED = True
 APP_STORE_URL = "https://apps.apple.com/app/id6824882107"
+# Discord-Server (Einladung läuft nie ab, landet in #welcome).
+DISCORD_URL = "https://discord.gg/FheVjeFyn"
 # Kennung der style.css im Link, damit Browser nach Änderungen nicht die alte Fassung aus dem Zwischenspeicher nehmen.
 CSS_VERSION = hashlib.sha1(open(os.path.join(ROOT, "style.css"), "rb").read()).hexdigest()[:8]
 UPDATED = {"en": "November 8, 2026", "de": "8. November 2026"}
@@ -84,7 +86,7 @@ def page(lang, file, title, body, description="", idle=False):
 </header>
 {body}
 </div>
-<footer><div class="wrap"><span>{footer}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in nav_items[1:] + ([] if idle else [("presskit.html", "Press kit" if lang == "en" else "Presse")]))}</span></div></footer>
+<footer><div class="wrap"><span>{footer}</span><span>{" · ".join(f'<a href="{h}">{l}</a>' for h, l in nav_items[1:] + ([] if idle else [("presskit.html", "Press kit" if lang == "en" else "Presse"), (DISCORD_URL, "Discord")]))}</span></div></footer>
 </body>
 </html>
 """
@@ -214,7 +216,7 @@ HOME = {
     "en": {
         "tag": "Beta now open · iPhone & Android",
         "lead": "Build your army, upgrade your heroes and storm the enemy castle. A cute but tactical lane battle game – easy to pick up, hard to master.",
-        "cta": [("#features", "Discover the game", "ghost")],
+        "cta": [("#features", "Discover the game", "ghost"), (DISCORD_URL, "Join our Discord", "ghost")],
         "beta_title": "Play the beta now",
         "beta_lead": "Bannerfall is in open testing. Pick your phone, install the beta and tell us what you think – your feedback shapes the game.",
         "beta_cards": [
@@ -277,7 +279,7 @@ HOME = {
     "de": {
         "tag": "Betatest läuft · iPhone & Android",
         "lead": "Stell deine Armee zusammen, werte deine Helden auf und stürme die gegnerische Burg. Ein niedliches, aber taktisches Lane-Battle-Spiel – schnell gelernt, schwer gemeistert.",
-        "cta": [("#features", "Spiel entdecken", "ghost")],
+        "cta": [("#features", "Spiel entdecken", "ghost"), (DISCORD_URL, "Zum Discord", "ghost")],
         "beta_title": "Jetzt die Beta spielen",
         "beta_lead": "Bannerfall ist im offenen Test. Wähl dein Handy, installier die Beta und sag uns, wie sie dir gefällt – dein Feedback formt das Spiel.",
         "beta_cards": [
@@ -517,7 +519,7 @@ def home(lang):
 <section id="units"><h2>{h["units_title"]}</h2><p class="section-lead">{h["units_lead"]}</p><div class="units">{units}</div></section>
 <section><h2>{h["fair_title"]}</h2><div class="features four">{fair}</div></section>
 <section class="faq"><h2>{h["faq_title"]}</h2>{faq}</section>
-<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><a class="btn gold" href="#beta">{gold_face(p, h["end_cta"])}</a></section>
+<section class="final"><h2>{h["end_title"]}</h2><p>{h["end_text"]}</p><div class="cta"><a class="btn gold" href="#beta">{gold_face(p, h["end_cta"])}</a><a class="btn ghost" href="{DISCORD_URL}" target="_blank" rel="noopener">Discord</a></div></section>
 </main>"""
     # Slider: Pfeile blättern eine Bildbreite weiter, mit der Maus lässt er sich ziehen.
     # Einheiten: Klick auf eine Stufe tauscht das Bild.
@@ -540,6 +542,7 @@ def support(lang):
         body = f"""<main class="doc">
 <h1>Support</h1>
 <p>Questions, feedback, a bug or a purchase problem? Write to <a href="mailto:{CONTACT}?subject=Bannerfall">{CONTACT}</a>. Please include your <strong>player ID</strong> (Settings in the game, shown at the bottom) and your device model.</p>
+<p>You can also report bugs, share decks and ask questions in our <a href="{DISCORD_URL}">Discord</a>.</p>
 <h2>Frequently asked questions</h2>
 <p><strong>I bought something but didn't receive it.</strong><br>Open Settings in the game and tap “Restore purchases”. If that doesn't help, email us with your player ID and the date of purchase.</p>
 <p><strong>How do I move my progress to a new phone?</strong><br>On the old phone: Settings → “Transfer progress” → create a code. Enter the code on the new phone within 24 hours.</p>
@@ -551,6 +554,7 @@ def support(lang):
         body = f"""<main class="doc">
 <h1>Support</h1>
 <p>Fragen, Feedback, ein Fehler oder ein Problem mit einem Kauf? Schreib an <a href="mailto:{CONTACT}?subject=Bannerfall">{CONTACT}</a>. Bitte gib deine <strong>Spieler-ID</strong> an (in den Einstellungen des Spiels ganz unten) und dein Gerätemodell.</p>
+<p>Fehler melden, Decks zeigen und Fragen stellen kannst du auch in unserem <a href="{DISCORD_URL}">Discord</a> (dort gibt es einen deutschen Kanal).</p>
 <h2>Häufige Fragen</h2>
 <p><strong>Ich habe etwas gekauft, aber nicht erhalten.</strong><br>Öffne im Spiel die Einstellungen und tippe auf „Käufe wiederherstellen“. Hilft das nicht, schreib uns mit Spieler-ID und Kaufdatum.</p>
 <p><strong>Wie nehme ich meinen Spielstand aufs neue Handy mit?</strong><br>Auf dem alten Handy: Einstellungen → „Spielstand übertragen“ → Code erstellen. Den Code innerhalb von 24 Stunden auf dem neuen Handy eingeben.</p>
